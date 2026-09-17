@@ -1,0 +1,103 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deploy at a time; a newer push supersedes an in-flight one.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      # The unit suite gates the deploy: a broken engine or save migration
+      # should never reach the published app.
+      - name: Unit tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      # The deploy job is rejected before it starts if Pages is serving from a
+      # branch rather than from Actions, or if the github-pages environment
+      # restricts which branches may deploy. Neither shows up in the deploy
+      # job's log, because that job never runs — so report both from here, and
+      # put the build type right if it is wrong.
+      - name: Report and repair Pages configuration
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          api() {
+            curl -sS -X "$1" \
+              -H "Authorization: Bearer $GH_TOKEN" \
+              -H "Accept: application/vnd.github+json" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              -H "Content-Type: application/json" \
+              -w '\nHTTP %{http_code}\n' \
+              "https://api.github.com/repos/$REPO$2" "${@:3}"
+          }
+
+          echo "::group::Pages configuration"
+          api GET /pages | tee pages.json
+          echo "::endgroup::"
+
+          build_type=$(grep -o '"build_type":[[:space:]]*"[^"]*"' pages.json | head -1 | cut -d'"' -f4 || true)
+          echo "build_type=${build_type:-unknown}"
+
+          if [ "$build_type" != "workflow" ]; then
+            echo "::warning::Pages build type is '${build_type:-unknown}'; deploy-pages needs 'workflow'. Setting it."
+            echo "::group::Set build type to workflow"
+            api PUT /pages -d '{"build_type":"workflow"}'
+            echo "::endgroup::"
+          fi
+
+          echo "::group::github-pages environment"
+          api GET /environments/github-pages || true
+          echo "::endgroup::"
+
+          echo "::group::Deployment branch policies"
+          api GET /environments/github-pages/deployment-branch-policies || true
+          echo "::endgroup::"
+
+      - name: Upload site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
