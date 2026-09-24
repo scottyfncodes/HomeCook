@@ -107,6 +107,46 @@ test.describe('HomeCook', () => {
     expect(after).toBeLessThanOrEqual(before);
   });
 
+  test('takes the budget you set, and lets you retype it', async ({ page }) => {
+    await page.goto(APP);
+    const more = page.getByRole('button', { name: 'Increase Weekly budget' });
+    await more.click();
+    await more.click();
+    await expect(page.locator('.stepper', { hasText: 'Weekly budget' }).locator('.stepper__value')).toHaveText(
+      '170 $',
+    );
+    await page.getByRole('button', { name: 'Plan my first week' }).click();
+    await expect(page.locator('.budget__label', { hasText: 'Budget' })).toHaveText('Budget $170.00');
+
+    // Clearing the box to retype must not zero the budget on the way.
+    await page.getByRole('button', { name: 'Profile' }).click();
+    const field = page.getByLabel('Weekly grocery budget');
+    await field.fill('');
+    await expect(field).toHaveValue('');
+    await field.pressSequentially('95.5');
+    await field.blur();
+    await expect(field).toHaveValue('95.5');
+    await page.getByRole('button', { name: 'Plan' }).click();
+    await expect(page.locator('.budget__label', { hasText: 'Budget' })).toHaveText('Budget $95.50');
+  });
+
+  test('shares what is left to buy', async ({ page, context }) => {
+    await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+    // Desktop Chromium has no share sheet; take the clipboard route every time.
+    await page.addInitScript(() => {
+      Object.defineProperty(navigator, 'share', { value: undefined });
+    });
+    await onboard(page);
+    await page.getByRole('button', { name: 'Grocery' }).click();
+    const first = await page.locator('.gitem__name').first().textContent();
+    await page.getByRole('button', { name: 'Share list' }).click();
+    await expect(page.getByText('Copied — paste it wherever you keep your list.')).toBeVisible();
+
+    const text = await page.evaluate(() => navigator.clipboard.readText());
+    expect(text).toMatch(/^HomeCook grocery list · week of \d+ \w{3}/);
+    expect(text).toContain(`• ${first}`);
+  });
+
   test('fits on a phone without sideways scrolling', async ({ page }) => {
     await onboard(page);
     const overflow = await page.evaluate(

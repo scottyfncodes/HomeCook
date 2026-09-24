@@ -75,22 +75,7 @@ export function ProfileScreen({ data }: { data: HomeCookData }) {
 
       <SectionTitle>The week</SectionTitle>
       <div className="card">
-        <div className="field">
-          <label htmlFor="budget">Weekly grocery budget</label>
-          <div className="qtyrow">
-            <span className="qtyrow__unit">$</span>
-            <input
-              id="budget"
-              className="input"
-              inputMode="decimal"
-              value={String(data.settings.budget)}
-              onChange={(event) => {
-                const value = Number(event.target.value.replace(/[^\d.]/g, ''));
-                apply((current) => setSettings(current, { budget: Number.isFinite(value) ? value : 0 }));
-              }}
-            />
-          </div>
-        </div>
+        <BudgetField budget={data.settings.budget} />
         <Stepper
           label="Dinners per week"
           value={data.settings.mealsPerWeek}
@@ -247,6 +232,44 @@ export function ProfileScreen({ data }: { data: HomeCookData }) {
         it lives in this browser until you export it.
       </p>
     </section>
+  );
+}
+
+/**
+ * The text is kept as typed ("", "12.") and only a real number is saved, so
+ * clearing the box to retype doesn't zero the budget in the meantime.
+ */
+function BudgetField({ budget }: { budget: number }) {
+  const [text, setText] = useState(String(budget));
+  const [focused, setFocused] = useState(false);
+  const shown = focused ? text : String(budget);
+
+  return (
+    <div className="field">
+      <label htmlFor="budget">Weekly grocery budget</label>
+      <div className="qtyrow">
+        <span className="qtyrow__unit">$</span>
+        <input
+          id="budget"
+          className="input"
+          inputMode="decimal"
+          value={shown}
+          onFocus={() => {
+            setText(String(budget));
+            setFocused(true);
+          }}
+          onBlur={() => setFocused(false)}
+          onChange={(event) => {
+            const next = event.target.value.replace(/[^\d.]/g, '');
+            setText(next);
+            const value = Number(next);
+            if (next.trim() && Number.isFinite(value)) {
+              apply((current) => setSettings(current, { budget: Math.round(value * 100) / 100 }));
+            }
+          }}
+        />
+      </div>
+    </div>
   );
 }
 
@@ -408,7 +431,8 @@ function DataPanel({ data }: { data: HomeCookData }) {
     link.href = url;
     link.download = exportFilename();
     link.click();
-    URL.revokeObjectURL(url);
+    // Revoking in the same tick cancels the download in Safari and Firefox.
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
     setStatus('Exported. Keep that file somewhere safe.');
   };
 

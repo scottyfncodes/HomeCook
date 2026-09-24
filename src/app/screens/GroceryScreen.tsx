@@ -11,7 +11,7 @@ import {
   toggleChecked,
 } from '@homecook/core/actions';
 import { apply } from '@homecook/app/useHomeCook';
-import { budgetStatus, buildGroceryList, type GroceryLine } from '@homecook/engine/grocery';
+import { budgetStatus, buildGroceryList, groceryListText, type GroceryLine } from '@homecook/engine/grocery';
 import { getStore } from '@homecook/data/stores';
 import { formatAmount, formatMoney } from '@homecook/engine/units';
 import { Btn, EmptyState, Meter, Row, Sheet } from '@homecook/app/components/ui';
@@ -22,10 +22,28 @@ export function GroceryScreen({ data }: { data: HomeCookData }) {
   const [draft, setDraft] = useState('');
   const [draftCategory, setDraftCategory] = useState<Category>('other');
   const [showCovered, setShowCovered] = useState(false);
+  const [shareStatus, setShareStatus] = useState<string | null>(null);
 
   const list = useMemo(() => buildGroceryList(data), [data]);
   const budget = budgetStatus(data.settings.budget, list.total);
   const store = getStore(data.settings.storeId);
+
+  const share = async () => {
+    const text = groceryListText(list, { storeName: store.name, weekOf: data.plan.weekOf });
+    try {
+      if (typeof navigator.share === 'function') {
+        await navigator.share({ title: 'Grocery list', text });
+        setShareStatus(null);
+        return;
+      }
+      await navigator.clipboard.writeText(text);
+      setShareStatus('Copied — paste it wherever you keep your list.');
+    } catch (error) {
+      // Closing the share sheet is a choice, not a failure.
+      if (error instanceof DOMException && error.name === 'AbortError') return;
+      setShareStatus("Couldn't share from this browser.");
+    }
+  };
 
   if (list.itemCount === 0 && list.covered.length === 0) {
     return (
@@ -164,6 +182,13 @@ export function GroceryScreen({ data }: { data: HomeCookData }) {
             + Add an item
           </Btn>
         )}
+
+        {list.checkedCount < list.itemCount && (
+          <Btn wide onClick={share}>
+            Share list
+          </Btn>
+        )}
+        {shareStatus && <p className="statusline">{shareStatus}</p>}
 
         {list.checkedCount > 0 && (
           <Btn variant="ghost" wide onClick={() => apply(clearCheckedItems)}>

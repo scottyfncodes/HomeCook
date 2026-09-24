@@ -3,6 +3,7 @@ import {
   addPantryItem,
   completeOnboarding,
   fillEmptyDays,
+  markCooked,
   removePantryItem,
   resetEverything,
   setHousehold,
@@ -160,5 +161,25 @@ describe('week lifecycle', () => {
     expect(data.ratings).toEqual({});
     expect(data.history).toEqual([]);
     expect(data.pantry).toEqual([]);
+  });
+});
+
+describe('rating a cooked meal', () => {
+  it('re-rating a dinner updates it rather than cooking it twice', () => {
+    const data = withMeals(makeData(), ['parmesan_garlic_chicken']);
+    const mealId = data.plan.meals[0]!.id;
+
+    const once = markCooked(data, mealId, 'good');
+    const again = markCooked(once, mealId, 'loved');
+
+    expect(again.history).toHaveLength(1);
+    expect(again.history[0]!.rating).toBe('loved');
+    expect(again.ratings.parmesan_garlic_chicken).toBe('loved');
+  });
+
+  it('records at least one diner, like the rest of the app', () => {
+    const empty = setHousehold(withMeals(makeData(), ['parmesan_garlic_chicken']), { adults: 0 });
+    const cooked = markCooked(empty, empty.plan.meals[0]!.id);
+    expect(cooked.history[0]!.diners).toBe(householdSize(empty.household));
   });
 });

@@ -6,7 +6,7 @@ import {
   setMealDiners,
   toggleChecked,
 } from '@homecook/core/actions';
-import { budgetStatus, buildGroceryList } from '@homecook/engine/grocery';
+import { budgetStatus, buildGroceryList, groceryListText } from '@homecook/engine/grocery';
 import { getIngredient } from '@homecook/data/ingredients';
 import { RECIPE_BY_ID } from '@homecook/data/recipes';
 import { makeData, withMeals } from './helpers';
@@ -143,5 +143,54 @@ describe('budget', () => {
     expect(list.total).toBeCloseTo(summed, 2);
     const beef = list.sections.flatMap((s) => s.lines).find((l) => l.key === 'ground_beef')!;
     expect(beef.cost).toBeCloseTo(beef.packages * getIngredient('ground_beef')!.pkg.price, 2);
+  });
+});
+
+describe('pantry quantities in other units', () => {
+  it('lets cups in the pantry cover a recipe measured by weight', () => {
+    const data = withMeals(makeData(), ['honey_garlic_pork']);
+    expect(lineFor(data, 'broccoli')).toBeDefined();
+
+    const stocked = addPantryItem(data, 'broccoli', 20, 'cup');
+    const list = buildGroceryList(stocked);
+    expect(lineFor(stocked, 'broccoli')).toBeUndefined();
+    expect(list.covered.find((line) => line.key === 'broccoli')?.coveredBy).toBe('pantry');
+  });
+});
+
+describe('sharing the list', () => {
+  it('lists what is still to buy, by aisle, with amounts and packs', () => {
+    const data = withMeals(makeData(), ['parmesan_garlic_chicken']);
+    const list = buildGroceryList(data);
+    const text = groceryListText(list, { storeName: 'Big supermarket', weekOf: '2026-09-21' });
+
+    expect(text.split('\n')[0]).toBe('HomeCook grocery list · week of 21 Sep');
+    expect(text).toContain('Big supermarket · about $');
+    expect(text).toContain('PRODUCE');
+    const garlic = getIngredient('garlic')!;
+    expect(text).toMatch(new RegExp(`• ${garlic.name} — .+ \\(\\d+ × `));
+  });
+
+  it('leaves out ticked rows and says so when everything is in the trolley', () => {
+    let data = withMeals(makeData(), ['parmesan_garlic_chicken']);
+    const garlic = getIngredient('garlic')!;
+    data = toggleChecked(data, 'garlic');
+    expect(groceryListText(buildGroceryList(data), { storeName: 'X', weekOf: '2026-09-21' })).not.toContain(
+      `• ${garlic.name} —`,
+    );
+
+    for (const line of buildGroceryList(data).sections.flatMap((s) => s.lines)) {
+      if (!line.checked) data = toggleChecked(data, line.key);
+    }
+    expect(groceryListText(buildGroceryList(data), { storeName: 'X', weekOf: '2026-09-21' })).toContain(
+      'Everything is picked up.',
+    );
+  });
+
+  it('includes items added by hand', () => {
+    const data = addCustomGroceryItem(withMeals(makeData(), ['parmesan_garlic_chicken']), 'Paper towels');
+    expect(groceryListText(buildGroceryList(data), { storeName: 'X', weekOf: '2026-09-21' })).toContain(
+      '• Paper towels',
+    );
   });
 });

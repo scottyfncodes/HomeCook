@@ -9,16 +9,17 @@
 import type {
   Category,
   HomeCookData,
+  Ingredient,
   PantryItem,
   Unit,
 } from '@homecook/core/types';
-import { CATEGORY_ORDER } from '@homecook/core/types';
+import { CATEGORY_LABEL, CATEGORY_ORDER } from '@homecook/core/types';
 import { getIngredient } from '@homecook/data/ingredients';
 import { getStore } from '@homecook/data/stores';
 import { packagesFor, round2, toCanonical } from '@homecook/engine/pricing';
 import { resolveWeek } from '@homecook/engine/plan';
 import { scaleIngredients } from '@homecook/engine/scale';
-import { convert } from '@homecook/engine/units';
+import { formatAmount, formatMoney } from '@homecook/engine/units';
 
 export interface GroceryLine {
   key: string;
@@ -61,12 +62,13 @@ export interface GroceryList {
   unpricedItems: number;
 }
 
-function pantryCoverage(pantry: PantryItem[], ingredientId: string, unit: Unit, need: number): number {
-  const entry = pantry.find((p) => p.ingredientId === ingredientId);
+function pantryCoverage(pantry: PantryItem[], ingredient: Ingredient, need: number): number {
+  const entry = pantry.find((p) => p.ingredientId === ingredient.id);
   if (!entry) return 0;
   // No quantity recorded means "we always have this" — salt, oil, spices.
   if (entry.qty === undefined || entry.unit === undefined) return need;
-  const have = convert(entry.qty, entry.unit, unit);
+  // Same conversion the recipes get, so "3 cups of rice" covers grams of rice.
+  const have = toCanonical(ingredient, entry.qty, entry.unit);
   if (have === null) return 0;
   return Math.max(0, Math.min(need, have));
 }
@@ -97,7 +99,7 @@ export function buildGroceryList(data: HomeCookData): GroceryList {
   for (const [ingredientId, entry] of totals) {
     const ingredient = getIngredient(ingredientId)!;
     const needQty = round2(entry.qty);
-    const fromPantry = round2(pantryCoverage(data.pantry, ingredientId, ingredient.unit, needQty));
+    const fromPantry = round2(pantryCoverage(data.pantry, ingredient, needQty));
     const buyQty = round2(Math.max(0, needQty - fromPantry));
     const priced = ingredient.priced !== false;
     const math = priced && buyQty > 0
@@ -189,4 +191,40 @@ export function budgetStatus(budget: number, spent: number): BudgetStatus {
     fraction: budget > 0 ? Math.min(1, spent / budget) : 0,
     over: remaining < 0,
   };
+}
+
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+/**
+ * The list as plain text, for sending to whoever is doing the shop. Only what
+ * is still to buy goes in — ticked rows are already in the trolley.
+ */
+export function groceryListText(list: GroceryList, opts: { storeName: string; weekOf: string }): string {
+  const [year, month, day] = opts.weekOf.split('-').map(Number);
+  const week = year && month && day ? `${day} ${MONTHS[month - 1]}` : opts.weekOf;
+  const out = [`HomeCook grocery list · week of ${week}`];
+
+  const remaining = list.sections
+    .map((section) => ({ ...section, lines: section.lines.filter((line) => !line.checked) }))
+    .filter((section) => section.lines.length > 0);
+  if (remaining.length === 0) {
+    out.push('', 'Everything is picked up.');
+    return out.join('\n');
+  }
+
+  const cost = round2(remaining.reduce((sum, s) => sum + s.lines.reduce((t, l) => t + l.cost, 0), 0));
+  out.push(`${opts.storeName} · about ${formatMoney(cost)} (estimate)`);
+
+  for (const section of remaining) {
+    out.push('', CATEGORY_LABEL[section.category].toUpperCase());
+    for (const line of section.lines) {
+      if (line.kind === 'custom') {
+        out.push(`• ${line.name}`);
+        continue;
+      }
+      const packs = line.packages > 0 ? ` (${line.packages} × ${line.packageLabel})` : '';
+      out.push(`• ${line.name} — ${formatAmount(line.buyQty, line.unit)}${packs}`);
+    }
+  }
+  return out.join('\n');
 }

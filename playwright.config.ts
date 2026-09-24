@@ -1,4 +1,9 @@
+import { existsSync } from 'node:fs';
 import { defineConfig, devices } from '@playwright/test';
+
+// A pre-installed Chromium (this sandbox, or CHROMIUM_PATH) wins; anywhere
+// else, such as CI, Playwright's own download is used.
+const chromium = process.env.CHROMIUM_PATH ?? '/opt/pw-browsers/chromium';
 
 /**
  * Mobile-first testing. Only Chromium is available in this environment, so the
@@ -15,7 +20,7 @@ export default defineConfig({
   reporter: [['list']],
   use: {
     ...devices['Desktop Chrome'],
-    launchOptions: { executablePath: process.env.CHROMIUM_PATH ?? '/opt/pw-browsers/chromium' },
+    launchOptions: existsSync(chromium) ? { executablePath: chromium } : {},
     viewport: { width: 390, height: 844 },
     deviceScaleFactor: 3,
     isMobile: true,

@@ -29,8 +29,9 @@ export function Onboarding() {
             value={budget}
             min={20}
             max={1000}
+            step={10}
             suffix=" $"
-            onChange={(value) => setBudget(Math.round(value / 5) * 5)}
+            onChange={setBudget}
           />
         </div>
 

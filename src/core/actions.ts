@@ -5,6 +5,7 @@
  */
 import type {
   Category,
+  CookedMeal,
   Cuisine,
   DietaryTag,
   HomeCookData,
@@ -15,8 +16,10 @@ import type {
   Recipe,
   Unit,
 } from '@homecook/core/types';
+import { localIsoDate } from '@homecook/core/dates';
 import { freshData, freshPlan } from '@homecook/core/persist';
 import { getIngredient, registerCustomIngredients, STAPLE_IDS } from '@homecook/data/ingredients';
+import { dinersFor } from '@homecook/engine/plan';
 import { ensureSlots, generateWeek, weekOf } from '@homecook/engine/planner';
 import type { ImportOutcome } from '@homecook/engine/importer';
 
@@ -106,9 +109,25 @@ export function setExtraServings(data: HomeCookData, mealId: string, extra: numb
 export function markCooked(data: HomeCookData, mealId: string, rating?: Rating): HomeCookData {
   const meal = data.plan.meals.find((m) => m.id === mealId);
   if (!meal?.recipeId) return data;
-  const diners = meal.dinersOverride ?? data.household.adults + data.household.children + data.household.guests;
-  const entry = { recipeId: meal.recipeId, date: new Date().toISOString().slice(0, 10), diners, rating };
-  const withHistory = { ...data, history: [...data.history, entry] };
+  const entry: CookedMeal = {
+    recipeId: meal.recipeId,
+    date: localIsoDate(),
+    diners: dinersFor(meal, data.household),
+    rating,
+  };
+  // Changing your mind about a meal already marked cooked re-rates that
+  // dinner; it doesn't cook it a second time.
+  let previous = -1;
+  if (meal.cooked) {
+    for (let index = data.history.length - 1; index >= 0 && previous < 0; index -= 1) {
+      if (data.history[index]!.recipeId === meal.recipeId) previous = index;
+    }
+  }
+  const history =
+    previous >= 0
+      ? data.history.map((h, index) => (index === previous ? { ...h, rating: rating ?? h.rating } : h))
+      : [...data.history, entry];
+  const withHistory = { ...data, history };
   const rated = rating ? { ...withHistory, ratings: { ...data.ratings, [meal.recipeId]: rating } } : withHistory;
   return mapMeal(rated, mealId, (m) => ({ ...m, cooked: true }));
 }

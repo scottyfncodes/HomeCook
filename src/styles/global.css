@@ -610,7 +610,8 @@ p {
 .input--area {
   min-height: 120px;
   resize: vertical;
-  font-size: 0.9rem;
+  /* Under 16px, iOS zooms the page when the field is focused. */
+  font-size: 1rem;
   line-height: 1.4;
 }
 
