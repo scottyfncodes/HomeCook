@@ -30,7 +30,9 @@ imported on another device.
 - **The pantry is subtracted first**, with real quantities and unit
   conversion, before anything is priced.
 - **One grocery list**, rebuilt from the plan every time the plan changes,
-  grouped by aisle-ish category, with the meals each item is for.
+  grouped by aisle-ish category, with the meals each item is for — and one tap
+  to share what's still to buy through the phone's share sheet (or the
+  clipboard).
 - **Swap and lock.** Locked meals survive a regenerate; swapping shows what it
   does to the week's basket before you commit.
 - **A deterministic recommendation engine** — no model in the loop. Taste
@@ -76,8 +78,11 @@ npm test            # unit tests (engine, data integrity, persistence)
 npm run e2e         # end-to-end tests at a phone viewport
 ```
 
-Deployed to GitHub Pages by `.github/workflows/deploy-pages.yml` on every
-push to `main`; the unit suite has to pass before the site goes out.
+Pull requests run `.github/workflows/ci.yml`: typecheck, the unit suite (in
+UTC, Tokyo and Los Angeles, because planning days are local days), a
+production build, and the end-to-end pass. Deployed to GitHub Pages by
+`.github/workflows/deploy-pages.yml` on every push to `main`; the unit suite
+has to pass before the site goes out.
 
 ## Deliberately not built yet
 

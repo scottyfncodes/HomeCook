@@ -78,6 +78,7 @@ export function Stepper({
   onChange,
   min = 0,
   max = 99,
+  step = 1,
   label,
   suffix,
 }: {
@@ -85,6 +86,7 @@ export function Stepper({
   onChange: (next: number) => void;
   min?: number;
   max?: number;
+  step?: number;
   label?: string;
   suffix?: string;
 }) {
@@ -95,7 +97,7 @@ export function Stepper({
         <button
           type="button"
           className="stepper__btn"
-          onClick={() => onChange(Math.max(min, value - 1))}
+          onClick={() => onChange(Math.max(min, value - step))}
           disabled={value <= min}
           aria-label={`Decrease ${label ?? 'value'}`}
         >
@@ -108,7 +110,7 @@ export function Stepper({
         <button
           type="button"
           className="stepper__btn"
-          onClick={() => onChange(Math.min(max, value + 1))}
+          onClick={() => onChange(Math.min(max, value + step))}
           disabled={value >= max}
           aria-label={`Increase ${label ?? 'value'}`}
         >

@@ -29,7 +29,7 @@ import type {
 import { CATEGORY_ORDER, RATINGS } from '@homecook/core/types';
 import { DEFAULT_STORE_ID, STORES } from '@homecook/data/stores';
 import { registerCustomIngredients } from '@homecook/data/ingredients';
-import { slotDays } from '@homecook/engine/planner';
+import { slotDays, weekOf } from '@homecook/engine/planner';
 
 export const STORAGE_KEY = 'homecook.data.v1';
 export const REJECTED_KEY = 'homecook.data.rejected';
@@ -40,7 +40,7 @@ export const DEFAULT_MEALS = 5;
 
 export function freshPlan(mealCount = DEFAULT_MEALS): WeekPlan {
   return {
-    weekOf: new Date().toISOString().slice(0, 10),
+    weekOf: weekOf(new Date()),
     seed: 1,
     meals: slotDays(mealCount).map((day, index) => ({
       id: `meal_${index}_${day.toLowerCase()}`,
@@ -229,6 +229,7 @@ function sanitiseRecipes(value: unknown): Recipe[] {
     const id = str(raw.id, '');
     const name = str(raw.name, '');
     if (!id || !name || out.some((r) => r.id === id)) continue;
+    const source = oneOf(raw.source, ['library', 'imported', 'manual'] as const, 'imported');
     out.push({
       id,
       name,
@@ -257,8 +258,10 @@ function sanitiseRecipes(value: unknown): Recipe[] {
       difficulty: oneOf(raw.difficulty, ['easy', 'medium', 'involved'] as const, 'easy'),
       leftoverPotential: oneOf(raw.leftoverPotential, ['low', 'medium', 'high'] as const, 'medium'),
       steps: strArray(raw.steps),
-      source: oneOf(raw.source, ['library', 'imported', 'manual'] as const, 'imported'),
-      planReady: raw.planReady === true,
+      source,
+      // An import earns plannability by resolving; a recipe typed in by hand
+      // has it unless it says otherwise.
+      planReady: typeof raw.planReady === 'boolean' ? raw.planReady : source !== 'imported',
       importedAt: typeof raw.importedAt === 'number' ? raw.importedAt : undefined,
     });
   }
@@ -286,6 +289,8 @@ function sanitiseCustomIngredients(value: unknown): Ingredient[] {
         price: num(pkg.price, 0, 0, 1000),
         label: typeof pkg.label === 'string' ? pkg.label : 'as needed',
       },
+      aliases: raw.aliases === undefined ? undefined : strArray(raw.aliases),
+      gramsPerCup: typeof raw.gramsPerCup === 'number' && raw.gramsPerCup > 0 ? raw.gramsPerCup : undefined,
       priced: raw.priced === true,
     });
   }

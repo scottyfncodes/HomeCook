@@ -190,3 +190,43 @@ describe('export and import', () => {
     expect(result.data.customIngredients[0]!.priced).toBe(false);
   });
 });
+
+describe('recipes and ingredients survive a reload intact', () => {
+  it('keeps a hand-entered recipe plannable', () => {
+    const manual = {
+      id: 'manual_soup',
+      name: 'Soup',
+      source: 'manual',
+      ingredients: [{ ingredientId: 'onion', qty: 1, unit: 'count' }],
+    };
+    const data = sanitise({ ...makeData(), imported: [manual] });
+    expect(data.imported[0]!.planReady).toBe(true);
+  });
+
+  it('keeps an import that did not resolve out of the planner', () => {
+    const imported = { id: 'imported_x', name: 'X', source: 'imported', planReady: false, ingredients: [] };
+    expect(sanitise({ ...makeData(), imported: [imported] }).imported[0]!.planReady).toBe(false);
+    const unsure = { id: 'imported_y', name: 'Y', source: 'imported', ingredients: [] };
+    expect(sanitise({ ...makeData(), imported: [unsure] }).imported[0]!.planReady).toBe(false);
+  });
+
+  it("keeps a custom ingredient's cup weight and aliases", () => {
+    const custom = {
+      id: 'x_farro',
+      name: 'Farro',
+      unit: 'g',
+      category: 'pantry',
+      pkg: { size: 500, unit: 'g', price: 0 },
+      gramsPerCup: 200,
+      aliases: ['pearled farro'],
+    };
+    const [farro] = sanitise({ ...makeData(), customIngredients: [custom] }).customIngredients;
+    expect(farro!.gramsPerCup).toBe(200);
+    expect(farro!.aliases).toEqual(['pearled farro']);
+  });
+
+  it("dates a fresh plan from this week's Monday", () => {
+    const monday = freshData().plan.weekOf;
+    expect(new Date(`${monday}T12:00:00`).getDay()).toBe(1);
+  });
+});

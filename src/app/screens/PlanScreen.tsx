@@ -173,9 +173,11 @@ function SwapSheet({ data, mealId, onClose }: { data: HomeCookData; mealId: stri
                   {option.cautions[0] && <span className="swap__caution">• {option.cautions[0]}</span>}
                 </span>
                 <span
-                  className={`swap__delta ${option.costDelta > 0 ? 'swap__delta--up' : 'swap__delta--down'}`}
+                  className={`swap__delta ${
+                    option.costDelta > 0 ? 'swap__delta--up' : option.costDelta < 0 ? 'swap__delta--down' : ''
+                  }`}
                 >
-                  {option.costDelta >= 0 ? '+' : '−'}
+                  {option.costDelta > 0 ? '+' : option.costDelta < 0 ? '−' : '±'}
                   {formatMoney(Math.abs(option.costDelta))}
                 </span>
               </button>

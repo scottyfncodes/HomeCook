@@ -227,3 +227,16 @@ describe('explaining a choice', () => {
     expect(candidate.reasons.join(' ')).toMatch(/pantry/i);
   });
 });
+
+describe('filling around a meal that no longer fits', () => {
+  it('does not fall over when an excluded meal is kept and the week is over budget', () => {
+    // Strict enough that the pool runs out before the week does.
+    let data = withMeals(makeData(), Array(7).fill(null));
+    data = { ...data, plan: { ...data.plan, meals: data.plan.meals.map((m) => ({ ...m, recipeId: 'honey_garlic_pork' })) } };
+    for (const tag of ['vegetarian', 'gluten-free', 'dairy-free', 'nut-free'] as const) data = toggleDietary(data, tag);
+    data = setSettings(data, { budget: 1 });
+
+    const week = generateWeek(data, { seed: 3, today: TODAY, fillOnly: true });
+    expect(week.meals).toHaveLength(7);
+  });
+});

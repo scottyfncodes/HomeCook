@@ -10,12 +10,13 @@
  *         − repetition − recency + time fit
  */
 import type { HomeCookData, PlannedMeal, Recipe, WeekPlan } from '@homecook/core/types';
+import { daysBetween, localIsoDate } from '@homecook/core/dates';
 import { makeRng } from '@homecook/core/rng';
 import { getStore } from '@homecook/data/stores';
 import { isExcluded } from '@homecook/engine/constraints';
 import { buildGroceryList } from '@homecook/engine/grocery';
 import { plannableRecipes } from '@homecook/engine/library';
-import { DAYS, dinersFor, householdSize } from '@homecook/engine/plan';
+import { DAYS, dinersFor } from '@homecook/engine/plan';
 import { estimateMealCost, round2 } from '@homecook/engine/pricing';
 import { planServings, scaledTime } from '@homecook/engine/scale';
 import { buildTasteProfile, similarLikedCount, tasteScore, type TasteProfile } from '@homecook/engine/taste';
@@ -56,13 +57,8 @@ interface ScoreContext {
   daysSinceCooked: Map<string, number>;
 }
 
-function daysBetween(a: string, b: string): number {
-  const ms = new Date(b).getTime() - new Date(a).getTime();
-  return Math.round(ms / 86_400_000);
-}
-
 export function recentlyCooked(data: HomeCookData, today = new Date()): Map<string, number> {
-  const iso = today.toISOString().slice(0, 10);
+  const iso = localIsoDate(today);
   const map = new Map<string, number>();
   for (const entry of data.history) {
     const days = daysBetween(entry.date, iso);
@@ -299,9 +295,15 @@ export function generateWeek(data: HomeCookData, options: GenerateOptions = {}):
     if (recipe) chosen.set(meal.id, recipe);
   }
 
+  // What the kept meals will cost at the size they are actually cooked, so the
+  // open days share out what is really left of the budget.
+  const storeFactor = getStore(data.settings.storeId).factor;
   let spent = 0;
-  for (const recipe of chosen.values()) {
-    spent += estimateMealCost(recipe, recipe.servings, getStore(data.settings.storeId).factor);
+  for (const meal of meals) {
+    const recipe = chosen.get(meal.id);
+    if (!recipe) continue;
+    const serving = planServings(recipe, dinersFor(meal, data.household), data.settings.leftovers, meal.extraServings);
+    spent += estimateMealCost(recipe, serving.servings, storeFactor);
   }
 
   meals.forEach((meal, index) => {
@@ -310,7 +312,7 @@ export function generateWeek(data: HomeCookData, options: GenerateOptions = {}):
     const allowance = Math.max(6, (data.settings.budget - spent) / Math.max(1, openSlots));
     const weekRecipes = [...chosen.values()];
     const previous = index > 0 ? chosen.get(meals[index - 1]!.id) ?? null : null;
-    const diners = meal.dinersOverride ?? householdSize(data.household);
+    const diners = dinersFor(meal, data.household);
 
     const ctx = buildContext(data, {
       weekRecipes,
@@ -354,21 +356,18 @@ function repairBudget(
 
   for (let attempt = 0; attempt < 8 && total > budget; attempt += 1) {
     const meals = current.plan.meals;
+    // A kept recipe can be missing from the pool (excluded since it was
+    // planned); it isn't the planner's to trade, so it is left alone.
+    const storeFactor = getStore(current.settings.storeId).factor;
     const swappable = meals
-      .map((meal, index) => ({ meal, index }))
-      .filter(({ meal }) => !meal.locked && meal.recipeId)
-      .map(({ meal, index }) => {
-        const recipe = pool.find((r) => r.id === meal.recipeId)!;
+      .filter((meal) => !meal.locked && meal.recipeId)
+      .flatMap((meal) => {
+        const recipe = pool.find((r) => r.id === meal.recipeId);
+        if (!recipe) return [];
         const diners = dinersFor(meal, current.household);
         const serving = planServings(recipe, diners, current.settings.leftovers, meal.extraServings);
-        return {
-          meal,
-          index,
-          recipe,
-          cost: estimateMealCost(recipe, serving.servings, getStore(current.settings.storeId).factor),
-        };
+        return [{ meal, recipe, cost: estimateMealCost(recipe, serving.servings, storeFactor) }];
       })
-      .filter((entry) => entry.recipe)
       .sort((a, b) => b.cost - a.cost);
 
     let improved = false;
@@ -492,5 +491,5 @@ export function weekOf(date: Date): string {
   const d = new Date(date);
   const day = (d.getDay() + 6) % 7;
   d.setDate(d.getDate() - day);
-  return d.toISOString().slice(0, 10);
+  return localIsoDate(d);
 }
