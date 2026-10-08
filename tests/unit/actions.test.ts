@@ -155,6 +155,14 @@ describe('week lifecycle', () => {
     expect(data.pantry.length).toBe(STAPLE_IDS.length);
   });
 
+  it('plans the same first week for the same seed, so the opening preview is honest', () => {
+    const config = { adults: 2, children: 0, budget: 150, mealsPerWeek: 5, storeId: 'supermarket', stockStaples: true, seed: 5 };
+    const preview = completeOnboarding(makeData(), config);
+    const real = completeOnboarding(makeData({ createdAt: 1 }), config);
+    expect(real.plan.meals.map((m) => m.recipeId)).toEqual(preview.plan.meals.map((m) => m.recipeId));
+    expect(buildGroceryList(real).total).toBe(buildGroceryList(preview).total);
+  });
+
   it('resets back to a clean install', () => {
     const data = resetEverything();
     expect(data.onboarded).toBe(false);
