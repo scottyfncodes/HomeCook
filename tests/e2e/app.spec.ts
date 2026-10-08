@@ -107,8 +107,38 @@ test.describe('HomeCook', () => {
     expect(after).toBeLessThanOrEqual(before);
   });
 
+  test('opens on an example week that becomes the first real week', async ({ page }) => {
+    await page.goto(APP);
+    // The answer comes before the questions: a planned week with its basket.
+    await expect(page.getByText('Example week')).toBeVisible();
+    const preview = page.locator('.preview__meal');
+    await expect(preview).toHaveCount(5);
+    const names = await page.locator('.preview__name').allTextContents();
+    const basket = await page.locator('.preview .budget__spent').textContent();
+    expect(money(basket)).toBeGreaterThan(0);
+
+    // The household controls wait, folded, below it; the button is in reach.
+    await expect(page.getByRole('button', { name: 'Increase Adults' })).toBeHidden();
+    const cta = await page.getByRole('button', { name: 'Plan my first week' }).boundingBox();
+    expect(cta!.y + cta!.height).toBeLessThanOrEqual(844);
+
+    // The controls re-plan the preview as they change.
+    await page.getByText('Adjust for your household').click();
+    await page.getByRole('button', { name: 'Increase Dinners this week' }).click();
+    await expect(preview).toHaveCount(6);
+    await page.getByRole('button', { name: 'Decrease Dinners this week' }).click();
+    await expect(preview).toHaveCount(5);
+
+    // What was shown is what you get.
+    await page.getByRole('button', { name: 'Plan my first week' }).click();
+    await expect(page.getByRole('heading', { name: 'This week' })).toBeVisible();
+    await expect(page.locator('.meal__name')).toHaveText(names);
+    await expect(page.locator('.budget__spent').first()).toHaveText(basket!);
+  });
+
   test('takes the budget you set, and lets you retype it', async ({ page }) => {
     await page.goto(APP);
+    await page.getByText('Adjust for your household').click();
     const more = page.getByRole('button', { name: 'Increase Weekly budget' });
     await more.click();
     await more.click();

@@ -300,6 +300,8 @@ export function completeOnboarding(
     mealsPerWeek: number;
     storeId: string;
     stockStaples: boolean;
+    /** Fixed seed, so a week shown before onboarding is the week you get. */
+    seed?: number;
   },
 ): HomeCookData {
   let next = setHousehold(data, { adults: config.adults, children: config.children, guests: 0 });
@@ -310,7 +312,7 @@ export function completeOnboarding(
   });
   if (config.stockStaples) next = stockStaples(next);
   next = { ...next, onboarded: true };
-  return regenerateWeek(next);
+  return regenerateWeek(next, config.seed);
 }
 
 export function resetEverything(): HomeCookData {

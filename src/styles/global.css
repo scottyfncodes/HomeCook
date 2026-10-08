@@ -1254,12 +1254,33 @@ p {
 
 /* ---- Onboarding ---- */
 
+/*
+ * The first screen leads with the week itself: a planned example week with
+ * its basket total, then the household controls folded away, then the one
+ * button. A warm wash at the top and a pot on the hob are the only decoration.
+ */
+
 .onboard {
+  --plate-red: #f8e3d8;
+  --plate-gold: #f6ead0;
+  --plate-blue: #dfeaf2;
+  --plate-green: var(--accent-soft);
+  --plate-neutral: var(--line);
+  --wash: #f4dcc6;
   min-height: 100dvh;
   display: flex;
-  align-items: center;
   justify-content: center;
-  padding: 24px 16px calc(24px + var(--safe-bottom));
+  padding: max(20px, env(safe-area-inset-top, 0px)) 16px 0;
+  background: radial-gradient(120% 55% at 50% -8%, var(--wash) 0%, var(--bg) 70%);
+}
+
+@media (prefers-color-scheme: dark) {
+  .onboard {
+    --plate-red: #42271d;
+    --plate-gold: #3f3219;
+    --plate-blue: #1f3240;
+    --wash: #3a2a1d;
+  }
 }
 
 .onboard__inner {
@@ -1267,19 +1288,311 @@ p {
   max-width: 460px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
+}
+
+.onboard__brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 2px 2px 4px;
+}
+
+.potmark {
+  flex: 0 0 auto;
+  color: var(--warn);
+}
+
+/* Steam drifts up while the screen is at rest. */
+.potmark__wisp {
+  animation: steam 2.8s ease-in-out infinite;
+  transform-origin: 50% 100%;
+}
+
+.potmark__wisp--mid {
+  animation-delay: -0.9s;
+}
+
+.potmark__wisp--late {
+  animation-delay: -1.8s;
+}
+
+@keyframes steam {
+  0% {
+    opacity: 0.25;
+    transform: translateY(3px);
+  }
+  50% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0.1;
+    transform: translateY(-4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .potmark__wisp {
+    animation: none;
+    opacity: 0.7;
+  }
 }
 
 .onboard__title {
-  font-size: 2.1rem;
+  font-size: 1.75rem;
   letter-spacing: -0.03em;
-  text-align: center;
-  margin-bottom: 0;
+  line-height: 1.1;
 }
 
 .onboard__tag {
-  text-align: center;
   color: var(--muted);
+  font-size: 0.88rem;
+  margin: 2px 0 0;
+  text-wrap: balance;
+}
+
+/* The example week */
+
+.preview {
+  gap: 8px;
+  padding: 14px 14px 12px;
+}
+
+.preview__head {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.preview__kicker {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  color: var(--warn);
+}
+
+.preview__title {
+  font-size: 0.92rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.preview__list {
+  list-style: none;
+  margin: 2px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.preview__meal {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+  border-top: 1px solid var(--line);
+}
+
+.preview__meal:first-child {
+  border-top: none;
+}
+
+.preview__day {
+  flex: 0 0 28px;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.preview__plate {
+  flex: 0 0 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.12rem;
+  line-height: 1;
+  background: var(--plate-neutral);
+  box-shadow: inset 0 0 0 2px var(--card), 0 0 0 1px var(--line);
+}
+
+.preview__plate--red {
+  background: var(--plate-red);
+}
+
+.preview__plate--gold {
+  background: var(--plate-gold);
+}
+
+.preview__plate--blue {
+  background: var(--plate-blue);
+}
+
+.preview__plate--green {
+  background: var(--plate-green);
+}
+
+.preview__text {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.preview__name {
+  font-weight: 700;
+  font-size: 0.95rem;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  /* Wrap rather than cut the dish off; two lines is the most any name needs. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.preview__meta {
+  color: var(--muted);
+  font-size: 0.76rem;
+}
+
+.preview__cost {
+  flex: 0 0 auto;
+  font-weight: 700;
   font-size: 0.9rem;
-  margin-top: -6px;
+  color: var(--gold);
+  font-variant-numeric: tabular-nums;
+}
+
+.preview__total {
+  border-top: 1px solid var(--line);
+  padding-top: 8px;
+  margin-top: 2px;
+}
+
+.preview .budget__spent {
+  font-size: 1.45rem;
+}
+
+.preview__note {
+  margin: 2px 0 0;
+  font-size: 0.74rem;
+}
+
+/* The household, folded away */
+
+.onboard__setup {
+  padding: 0;
+  gap: 0;
+}
+
+.onboard__summary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 16px;
+  cursor: pointer;
+  min-height: 56px;
+}
+
+.onboard__summary::-webkit-details-marker {
+  display: none;
+}
+
+.onboard__summary-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.onboard__summary-title {
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.onboard__summary-meta {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.onboard__summary-chevron {
+  flex: 0 0 auto;
+  width: 10px;
+  height: 10px;
+  border-right: 2px solid var(--muted);
+  border-bottom: 2px solid var(--muted);
+  transform: rotate(45deg);
+  margin: -4px 6px 0 0;
+  transition: transform 0.18s ease;
+}
+
+.onboard__setup[open] .onboard__summary-chevron {
+  transform: rotate(225deg);
+  margin-top: 4px;
+}
+
+.onboard__fields {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0 16px 16px;
+  border-top: 1px solid var(--line);
+}
+
+.onboard__fields .stepper:first-child {
+  padding-top: 6px;
+}
+
+/* The button stays in reach: pinned to the bottom edge, with the page
+   scrolling behind it when the household controls are open. */
+.onboard__cta {
+  position: sticky;
+  bottom: 0;
+  margin-top: auto;
+  padding: 12px 0 calc(14px + var(--safe-bottom));
+  background: linear-gradient(to top, var(--bg) 72%, rgba(247, 244, 239, 0));
+}
+
+@media (prefers-color-scheme: dark) {
+  .onboard__cta {
+    background: linear-gradient(to top, var(--bg) 72%, rgba(20, 19, 15, 0));
+  }
+}
+
+.onboard__cta .btn--primary {
+  min-height: 52px;
+  font-size: 1.02rem;
+  box-shadow: 0 6px 18px rgba(31, 122, 90, 0.28);
+}
+
+.onboard__privacy {
+  text-align: center;
+  margin: 10px 0 0;
+}
+
+@media (min-width: 700px) {
+  .onboard {
+    align-items: center;
+    padding: 40px 24px;
+  }
+
+  .onboard__inner {
+    max-width: 520px;
+    gap: 14px;
+  }
+
+  .onboard__cta {
+    position: static;
+    margin-top: 0;
+    padding-bottom: 0;
+    background: none;
+  }
 }
