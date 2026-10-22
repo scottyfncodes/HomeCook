@@ -406,7 +406,11 @@ p {
 }
 
 .meal__rating {
-  margin-left: 6px;
+  margin-left: 8px;
+  color: var(--muted);
+  font-size: 0.74rem;
+  font-weight: 600;
+  white-space: nowrap;
 }
 
 .meal__desc {
@@ -1177,10 +1181,6 @@ p {
   text-align: center;
   padding: 40px 20px;
   color: var(--muted);
-}
-
-.empty__icon {
-  font-size: 2.4rem;
 }
 
 .empty h3 {

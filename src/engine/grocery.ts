@@ -223,7 +223,7 @@ export function groceryListText(list: GroceryList, opts: { storeName: string; we
         continue;
       }
       const packs = line.packages > 0 ? ` (${line.packages} × ${line.packageLabel})` : '';
-      out.push(`• ${line.name} — ${formatAmount(line.buyQty, line.unit)}${packs}`);
+      out.push(`• ${line.name}: ${formatAmount(line.buyQty, line.unit)}${packs}`);
     }
   }
   return out.join('\n');

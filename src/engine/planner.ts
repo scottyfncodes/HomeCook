@@ -107,7 +107,7 @@ export function scoreCandidate(recipe: Recipe, ctx: ScoreContext): Candidate {
     const ratio = cost / ctx.allowance;
     const points = Math.max(-25, Math.min(14, (1 - ratio) * 20));
     components.push({ label: 'Budget fit', points: round2(points) });
-    if (ratio <= 0.8) reasons.push(`${formatMoney(cost)} for ${serving.servings} servings — under budget`);
+    if (ratio <= 0.8) reasons.push(`${formatMoney(cost)} for ${serving.servings} servings, under budget`);
     else if (ratio > 1.3) cautions.push(`Pricier than the rest of the week (${formatMoney(cost)})`);
   }
 

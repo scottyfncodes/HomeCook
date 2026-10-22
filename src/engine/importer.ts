@@ -419,7 +419,7 @@ export function importFromCsv(text: string, now = Date.now()): ImportOutcome {
       .map((l) => l.trim())
       .filter(Boolean);
     if (!ingredientLines.length) {
-      outcome.skipped.push(`${name} — no ingredients column`);
+      outcome.skipped.push(`${name}: no ingredients column`);
       continue;
     }
     const built = buildRecipe(
@@ -468,7 +468,7 @@ export function importFromJson(text: string, now = Date.now()): ImportOutcome {
         : [];
     const lines = ingredientLines.map((l) => l.trim()).filter(Boolean);
     if (!lines.length) {
-      outcome.skipped.push(`${name} — no ingredients`);
+      outcome.skipped.push(`${name}: no ingredients`);
       continue;
     }
     const steps = Array.isArray(raw.steps)

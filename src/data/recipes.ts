@@ -479,7 +479,7 @@ const DEFS: Def[] = [
     id: 'creamy_mushroom_chicken',
     name: 'Creamy Mushroom Chicken',
     emoji: '🍄',
-    description: 'Thyme, cream, mushrooms, orzo — a quiet weeknight favourite.',
+    description: 'Thyme, cream, mushrooms, orzo: a quiet weeknight favourite.',
     servings: 4,
     prepTime: 10,
     cookTime: 25,

@@ -37,7 +37,7 @@ export function GroceryScreen({ data }: { data: HomeCookData }) {
         return;
       }
       await navigator.clipboard.writeText(text);
-      setShareStatus('Copied — paste it wherever you keep your list.');
+      setShareStatus('Copied. Paste it wherever you keep your list.');
     } catch (error) {
       // Closing the share sheet is a choice, not a failure.
       if (error instanceof DOMException && error.name === 'AbortError') return;
@@ -52,7 +52,6 @@ export function GroceryScreen({ data }: { data: HomeCookData }) {
           <h1>Grocery</h1>
         </header>
         <EmptyState
-          icon="🧺"
           title="Nothing to buy yet"
           body="Plan some dinners and the list builds itself from what those recipes need."
         />
@@ -124,7 +123,7 @@ export function GroceryScreen({ data }: { data: HomeCookData }) {
                         }`}
                   </span>
                 </button>
-                <span className="gitem__price">{line.cost > 0 ? formatMoney(line.cost) : '—'}</span>
+                <span className="gitem__price">{line.cost > 0 ? formatMoney(line.cost) : 'no price'}</span>
               </li>
             ))}
           </ul>
@@ -230,7 +229,7 @@ export function GroceryScreen({ data }: { data: HomeCookData }) {
       )}
 
       <p className="fineprint">
-        The list is rebuilt from the plan every time it changes — swap a meal or change a headcount and
+        The list is rebuilt from the plan every time it changes. Swap a meal or change a headcount and
         these quantities follow.
       </p>
 

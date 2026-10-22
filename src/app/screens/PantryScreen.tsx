@@ -76,7 +76,7 @@ export function PantryScreen({ data }: { data: HomeCookData }) {
       {missingStaples.length > 0 && (
         <div className="card card--inset">
           <p>
-            <strong>Stock the usual staples?</strong> Salt, pepper, oil, spices, rice, flour — the
+            <strong>Stock the usual staples?</strong> Salt, pepper, oil, spices, rice, flour: the
             things most kitchens always have.
           </p>
           <Btn wide onClick={() => apply(stockStaples)}>
@@ -87,7 +87,6 @@ export function PantryScreen({ data }: { data: HomeCookData }) {
 
       {stocked.length === 0 ? (
         <EmptyState
-          icon="🧂"
           title="Your pantry is empty"
           body="Anything listed here is subtracted from the grocery list before HomeCook prices the week."
         />

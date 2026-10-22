@@ -69,7 +69,7 @@ export function ProfileScreen({ data }: { data: HomeCookData }) {
         />
         <Row label="Everyone at the table" value={`${size} ${size === 1 ? 'person' : 'people'}`} />
         <p className="fineprint">
-          One-off guests belong on the day itself — open a meal and change its headcount there.
+          One-off guests belong on the day itself. Open a meal and change its headcount there.
         </p>
       </div>
 
@@ -102,7 +102,7 @@ export function ProfileScreen({ data }: { data: HomeCookData }) {
           >
             {STORES.map((item) => (
               <option key={item.id} value={item.id}>
-                {item.name} — {item.note}
+                {item.name} ({item.note})
               </option>
             ))}
           </select>
@@ -228,7 +228,7 @@ export function ProfileScreen({ data }: { data: HomeCookData }) {
       <DataPanel data={data} />
 
       <p className="fineprint">
-        HomeCook — your meals, your budget, your kitchen. No account, no server, no analytics. All of
+        HomeCook: your meals, your budget, your kitchen. No account, no server, no analytics. All of
         it lives in this browser until you export it.
       </p>
     </section>
@@ -280,12 +280,12 @@ function TasteRow({ label, data }: { label: string; data: { likes: { label: stri
       <div className="chiprow">
         {data.likes.map((item) => (
           <Chip key={item.label} tone="good">
-            👍 {item.label}
+            + {item.label}
           </Chip>
         ))}
         {data.dislikes.map((item) => (
           <Chip key={item.label} tone="bad">
-            👎 {item.label}
+            − {item.label}
           </Chip>
         ))}
         {data.likes.length === 0 && data.dislikes.length === 0 && <Chip>no clear signal yet</Chip>}
@@ -363,14 +363,14 @@ function ImportPanel() {
       setStatus(
         outcome.skipped.length
           ? `Nothing imported. ${outcome.skipped.slice(0, 2).join('; ')}`
-          : "Nothing imported — HomeCook couldn't find a recipe in that.",
+          : "Nothing imported. HomeCook couldn't find a recipe in that.",
       );
       return;
     }
     apply((current) => applyImport(current, outcome));
     const plannable = outcome.recipes.filter((r) => r.planReady).length;
     setStatus(
-      `Imported ${outcome.recipes.length} recipes — ${plannable} ready to plan, ` +
+      `Imported ${outcome.recipes.length} recipes: ${plannable} ready to plan, ` +
         `${outcome.recipes.length - plannable} kept as taste reference.` +
         (outcome.skipped.length ? ` ${outcome.skipped.length} blocks skipped.` : ''),
     );
@@ -412,7 +412,7 @@ function ImportPanel() {
         </Btn>
         {status && <p className="statusline">{status}</p>}
         <p className="fineprint">
-          PDFs aren't supported yet — copy the text out of one and paste it here.
+          PDFs aren't supported yet. Copy the text out of one and paste it here.
         </p>
       </div>
     </>

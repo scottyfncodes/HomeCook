@@ -170,7 +170,7 @@ test.describe('HomeCook', () => {
     await page.getByRole('button', { name: 'Grocery' }).click();
     const first = await page.locator('.gitem__name').first().textContent();
     await page.getByRole('button', { name: 'Share list' }).click();
-    await expect(page.getByText('Copied — paste it wherever you keep your list.')).toBeVisible();
+    await expect(page.getByText('Copied. Paste it wherever you keep your list.')).toBeVisible();
 
     const text = await page.evaluate(() => navigator.clipboard.readText());
     expect(text).toMatch(/^HomeCook grocery list · week of \d+ \w{3}/);

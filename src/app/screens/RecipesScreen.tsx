@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import type { HomeCookData, Protein, Recipe } from '@homecook/core/types';
-import { RATINGS, RATING_EMOJI, RATING_LABEL } from '@homecook/core/types';
+import { RATINGS, RATING_LABEL } from '@homecook/core/types';
 import { rateRecipe, removeImportedRecipe, setMealRecipe } from '@homecook/core/actions';
 import { apply } from '@homecook/app/useHomeCook';
 import { allRecipes } from '@homecook/engine/library';
@@ -66,7 +66,7 @@ export function RecipesScreen({ data }: { data: HomeCookData }) {
       </div>
 
       {recipes.length === 0 ? (
-        <EmptyState icon="🔍" title="No matches" body="Try a different search or clear the filter." />
+        <EmptyState title="No matches" body="Try a different search or clear the filter." />
       ) : (
         <ul className="rlist">
           {recipes.map((recipe) => {
@@ -80,12 +80,11 @@ export function RecipesScreen({ data }: { data: HomeCookData }) {
                     {recipe.emoji}
                   </span>
                   <span className="ritem__text">
-                    <strong>
-                      {recipe.name} {rating ? RATING_EMOJI[rating] : ''}
-                    </strong>
+                    <strong>{recipe.name}</strong>
                     <span className="ritem__meta">
                       {recipe.cuisine} · {formatMinutes(scaledTime(recipe, serving.servings))} ·{' '}
                       {formatMoney(estimateMealCost(recipe, serving.servings, getStore(data.settings.storeId).factor))}
+                      {rating ? ` · ${RATING_LABEL[rating]}` : ''}
                     </span>
                     {recipe.source === 'imported' && (
                       <span className="ritem__badge">
@@ -173,7 +172,6 @@ function RecipeSheet({ data, recipe, onClose }: { data: HomeCookData; recipe: Re
             className={`rating ${rating === value ? 'rating--on' : ''}`}
             onClick={() => apply((current) => rateRecipe(current, recipe.id, rating === value ? null : value))}
           >
-            <span aria-hidden="true">{RATING_EMOJI[value]}</span>
             {RATING_LABEL[value]}
           </button>
         ))}
