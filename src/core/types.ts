@@ -184,14 +184,6 @@ export const RATING_LABEL: Record<Rating, string> = {
   never: 'Never again',
 };
 
-export const RATING_EMOJI: Record<Rating, string> = {
-  loved: '❤️',
-  good: '👍',
-  fine: '😐',
-  no: '👎',
-  never: '🚫',
-};
-
 export type LeftoverPreference = 'none' | 'sometimes' | 'frequently';
 
 export interface Household {

@@ -106,7 +106,7 @@ export function Onboarding() {
           </div>
           <Meter fraction={preview.budget.fraction} over={preview.budget.over} />
           <p className="fineprint preview__note">
-            {preview.totals.servings} servings, priced in whole packages — an estimate, not a checkout total.
+            {preview.totals.servings} servings, priced in whole packages. An estimate, not a checkout total.
             This becomes your week; swap or lock any night after.
           </p>
         </section>
@@ -158,7 +158,7 @@ export function Onboarding() {
               </Chip>
             </div>
             <p className="fineprint">
-              Salt, oil, spices, rice and so on — anything in the pantry is left off the grocery list.
+              Salt, oil, spices, rice and so on. Anything in the pantry is left off the grocery list.
             </p>
           </div>
         </details>

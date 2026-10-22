@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import type { HomeCookData, Rating } from '@homecook/core/types';
-import { RATINGS, RATING_EMOJI, RATING_LABEL } from '@homecook/core/types';
+import { RATINGS, RATING_LABEL } from '@homecook/core/types';
 import {
   markCooked,
   regenerateWeek,
@@ -117,7 +117,7 @@ export function PlanScreen({ data }: { data: HomeCookData }) {
       </div>
 
       <p className="fineprint">
-        Prices are estimates from HomeCook's own price table at {getStore(data.settings.storeId).name} —
+        Prices are estimates from HomeCook's own price table at {getStore(data.settings.storeId).name},
         not a checkout total.
       </p>
 
@@ -216,7 +216,7 @@ function WhySheet({ data, mealId, onClose }: { data: HomeCookData; mealId: strin
         </ul>
       ) : (
         <p className="sheet__empty">
-          Nothing strong either way — it simply scored highest for this slot.
+          Nothing strong either way. It simply scored highest for this slot.
         </p>
       )}
 
@@ -326,7 +326,6 @@ function OptionsSheet({ data, mealId, onClose }: { data: HomeCookData; mealId: s
               onClose();
             }}
           >
-            <span aria-hidden="true">{RATING_EMOJI[rating]}</span>
             {RATING_LABEL[rating]}
           </button>
         ))}

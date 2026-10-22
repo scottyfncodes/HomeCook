@@ -1,5 +1,5 @@
 import type { ResolvedMeal } from '@homecook/engine/plan';
-import { RATING_EMOJI } from '@homecook/core/types';
+import { RATING_LABEL } from '@homecook/core/types';
 import type { Rating } from '@homecook/core/types';
 import { formatMinutes, formatMoney } from '@homecook/engine/units';
 import { Btn } from '@homecook/app/components/ui';
@@ -52,7 +52,7 @@ export function MealCard({
           aria-pressed={meal.locked}
           aria-label={meal.locked ? `Unlock ${recipe.name}` : `Lock ${recipe.name}`}
         >
-          {meal.locked ? '🔒 Locked' : '🔓 Lock'}
+          {meal.locked ? 'Locked' : 'Lock'}
         </button>
       </header>
 
@@ -63,7 +63,7 @@ export function MealCard({
         <span className="meal__text">
           <span className="meal__name">
             {recipe.name}
-            {rating ? <span className="meal__rating">{RATING_EMOJI[rating]}</span> : null}
+            {rating ? <span className="meal__rating">{RATING_LABEL[rating]}</span> : null}
           </span>
           <span className="meal__desc">{recipe.description}</span>
         </span>

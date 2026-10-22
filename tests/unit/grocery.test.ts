@@ -168,7 +168,7 @@ describe('sharing the list', () => {
     expect(text).toContain('Big supermarket · about $');
     expect(text).toContain('PRODUCE');
     const garlic = getIngredient('garlic')!;
-    expect(text).toMatch(new RegExp(`• ${garlic.name} — .+ \\(\\d+ × `));
+    expect(text).toMatch(new RegExp(`• ${garlic.name}: .+ \\(\\d+ × `));
   });
 
   it('leaves out ticked rows and says so when everything is in the trolley', () => {
@@ -176,7 +176,7 @@ describe('sharing the list', () => {
     const garlic = getIngredient('garlic')!;
     data = toggleChecked(data, 'garlic');
     expect(groceryListText(buildGroceryList(data), { storeName: 'X', weekOf: '2026-09-21' })).not.toContain(
-      `• ${garlic.name} —`,
+      `• ${garlic.name}:`,
     );
 
     for (const line of buildGroceryList(data).sections.flatMap((s) => s.lines)) {
