@@ -151,7 +151,6 @@ export interface RecipeIngredient {
 export interface Recipe {
   id: string;
   name: string;
-  emoji: string;
   description: string;
   ingredients: RecipeIngredient[];
   /** Servings the quantities above are written for. */

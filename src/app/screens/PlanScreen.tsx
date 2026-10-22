@@ -160,9 +160,6 @@ function SwapSheet({ data, mealId, onClose }: { data: HomeCookData; mealId: stri
                   onClose();
                 }}
               >
-                <span className="swap__emoji" aria-hidden="true">
-                  {option.recipe.emoji}
-                </span>
                 <span className="swap__text">
                   <strong>{option.recipe.name}</strong>
                   <span className="swap__meta">
@@ -367,9 +364,6 @@ function PickSheet({ data, mealId, onClose }: { data: HomeCookData; mealId: stri
                 onClose();
               }}
             >
-              <span className="swap__emoji" aria-hidden="true">
-                {option.recipe.emoji}
-              </span>
               <span className="swap__text">
                 <strong>{option.recipe.name}</strong>
                 <span className="swap__meta">

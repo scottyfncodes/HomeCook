@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react';
-import type { Protein } from '@homecook/core/types';
 import { completeOnboarding } from '@homecook/core/actions';
 import { freshData } from '@homecook/core/persist';
 import { apply } from '@homecook/app/useHomeCook';
@@ -69,12 +68,6 @@ export function Onboarding() {
             {preview.resolved.map((item) => (
               <li key={item.meal.id} className="preview__meal">
                 <span className="preview__day">{item.meal.day.slice(0, 3)}</span>
-                <span
-                  className={`preview__plate preview__plate--${plateTone(item.recipe?.protein)}`}
-                  aria-hidden="true"
-                >
-                  {item.recipe?.emoji ?? '·'}
-                </span>
                 <span className="preview__text">
                   <span className="preview__name">{item.recipe?.name ?? 'Open night'}</span>
                   {item.recipe ? (
@@ -182,25 +175,6 @@ export function Onboarding() {
       </div>
     </div>
   );
-}
-
-/** Which tint sits behind a recipe's emoji on the example week. */
-function plateTone(protein: Protein | undefined): string {
-  switch (protein) {
-    case 'beef':
-    case 'sausage':
-      return 'red';
-    case 'pork':
-    case 'turkey':
-    case 'chicken':
-      return 'gold';
-    case 'seafood':
-      return 'blue';
-    case 'vegetarian':
-      return 'green';
-    default:
-      return 'neutral';
-  }
 }
 
 /** A pot on the hob, steam rising: the one piece of art on the first screen. */

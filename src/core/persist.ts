@@ -233,7 +233,6 @@ function sanitiseRecipes(value: unknown): Recipe[] {
     out.push({
       id,
       name,
-      emoji: str(raw.emoji, '🍽️'),
       description: str(raw.description, ''),
       ingredients: sanitiseIngredientRefs(raw.ingredients),
       servings: num(raw.servings, 2, 1, 40),

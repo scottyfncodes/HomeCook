@@ -218,7 +218,6 @@ export function buildRecipe(draft: RecipeDraft, now = Date.now()): {
   const recipe: Recipe = {
     id: `imported_${slug(draft.name)}_${String(now).slice(-5)}`,
     name: draft.name,
-    emoji: '📒',
     description: 'Imported from your recipe history.',
     ingredients,
     servings: draft.servings && draft.servings > 0 ? draft.servings : 2,
