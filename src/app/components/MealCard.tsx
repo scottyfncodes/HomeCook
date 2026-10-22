@@ -57,9 +57,6 @@ export function MealCard({
       </header>
 
       <button type="button" className="meal__main" onClick={onWhy}>
-        <span className="meal__emoji" aria-hidden="true">
-          {recipe.emoji}
-        </span>
         <span className="meal__text">
           <span className="meal__name">
             {recipe.name}

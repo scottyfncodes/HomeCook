@@ -76,9 +76,6 @@ export function RecipesScreen({ data }: { data: HomeCookData }) {
             return (
               <li key={recipe.id}>
                 <button type="button" className="ritem" onClick={() => setOpen(recipe)}>
-                  <span className="ritem__emoji" aria-hidden="true">
-                    {recipe.emoji}
-                  </span>
                   <span className="ritem__text">
                     <strong>{recipe.name}</strong>
                     <span className="ritem__meta">

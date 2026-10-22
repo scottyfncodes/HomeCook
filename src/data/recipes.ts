@@ -19,7 +19,6 @@ const DEFS: Def[] = [
   {
     id: 'parmesan_garlic_chicken',
     name: 'Parmesan Garlic Chicken',
-    emoji: '🍗',
     description: 'Crisp parmesan crust, garlic butter pan sauce, green beans alongside.',
     servings: 4,
     prepTime: 10,
@@ -53,7 +52,6 @@ const DEFS: Def[] = [
   {
     id: 'southwest_beef_bowls',
     name: 'Southwest Beef Rice Bowls',
-    emoji: '🌯',
     description: 'Chili-cumin beef over rice with black beans, peppers and lime.',
     servings: 4,
     prepTime: 10,
@@ -87,7 +85,6 @@ const DEFS: Def[] = [
   {
     id: 'creamy_tuscan_sausage',
     name: 'Creamy Tuscan Sausage Pasta',
-    emoji: '🍝',
     description: 'One pot: sausage, sun-dried tomato, spinach and cream over penne.',
     servings: 4,
     prepTime: 10,
@@ -119,7 +116,6 @@ const DEFS: Def[] = [
   {
     id: 'korean_beef_bowls',
     name: 'Korean-Style Beef Bowls',
-    emoji: '🥢',
     description: 'Gochujang beef, quick cucumbers, rice and a jammy egg.',
     servings: 4,
     prepTime: 10,
@@ -155,7 +151,6 @@ const DEFS: Def[] = [
   {
     id: 'garlic_herb_chicken_pasta',
     name: 'Garlic Herb Chicken Pasta',
-    emoji: '🍋',
     description: 'Lemon, garlic, butter and parsley with blistered tomatoes.',
     servings: 4,
     prepTime: 10,
@@ -188,7 +183,6 @@ const DEFS: Def[] = [
   {
     id: 'sheetpan_lemon_chicken',
     name: 'Sheet-Pan Lemon Chicken & Potatoes',
-    emoji: '🍋',
     description: 'One tray, forty minutes, almost no washing up.',
     servings: 4,
     prepTime: 10,
@@ -219,7 +213,6 @@ const DEFS: Def[] = [
   {
     id: 'smoky_beef_tacos',
     name: 'Smoky Beef Tacos',
-    emoji: '🌮',
     description: 'Smoked paprika beef, crunchy cabbage, lime crema.',
     servings: 4,
     prepTime: 10,
@@ -253,7 +246,6 @@ const DEFS: Def[] = [
   {
     id: 'honey_garlic_pork',
     name: 'Honey Garlic Pork Chops',
-    emoji: '🍯',
     description: 'Sticky glaze, rice, and broccoli that catches the sauce.',
     servings: 4,
     prepTime: 5,
@@ -283,7 +275,6 @@ const DEFS: Def[] = [
   {
     id: 'shrimp_scampi',
     name: 'Shrimp Scampi Linguine',
-    emoji: '🍤',
     description: 'Twenty minutes, one pan of garlic butter, lots of lemon.',
     servings: 4,
     prepTime: 10,
@@ -314,7 +305,6 @@ const DEFS: Def[] = [
   {
     id: 'sheetpan_salmon',
     name: 'Sheet-Pan Salmon & Asparagus',
-    emoji: '🐟',
     description: 'Dijon-honey glaze, crisp potatoes, one tray.',
     servings: 4,
     prepTime: 10,
@@ -344,7 +334,6 @@ const DEFS: Def[] = [
   {
     id: 'chicken_tikka_curry',
     name: 'Chicken Tikka-Style Curry',
-    emoji: '🍛',
     description: 'Tomato-coconut curry, warm spices, rice and naan.',
     servings: 4,
     prepTime: 15,
@@ -378,7 +367,6 @@ const DEFS: Def[] = [
   {
     id: 'peanut_noodles',
     name: 'Thai-Style Peanut Noodles',
-    emoji: '🥜',
     description: 'Crunchy vegetables, peanut-lime sauce, ready in 20.',
     servings: 4,
     prepTime: 15,
@@ -411,7 +399,6 @@ const DEFS: Def[] = [
   {
     id: 'beef_broccoli',
     name: 'Beef & Broccoli Stir-Fry',
-    emoji: '🥦',
     description: 'Fast wok-style dinner with a glossy soy-garlic sauce.',
     servings: 4,
     prepTime: 15,
@@ -444,7 +431,6 @@ const DEFS: Def[] = [
   {
     id: 'chicken_fajita_bowls',
     name: 'Chicken Fajita Bowls',
-    emoji: '🌶️',
     description: 'Charred peppers and onions, lime rice, avocado.',
     servings: 4,
     prepTime: 10,
@@ -478,7 +464,6 @@ const DEFS: Def[] = [
   {
     id: 'creamy_mushroom_chicken',
     name: 'Creamy Mushroom Chicken',
-    emoji: '🍄',
     description: 'Thyme, cream, mushrooms, orzo: a quiet weeknight favourite.',
     servings: 4,
     prepTime: 10,
@@ -511,7 +496,6 @@ const DEFS: Def[] = [
   {
     id: 'turkey_chili',
     name: 'Turkey Chili',
-    emoji: '🍲',
     description: 'A big pot that gets better the next day.',
     servings: 6,
     prepTime: 10,
@@ -544,7 +528,6 @@ const DEFS: Def[] = [
   {
     id: 'baked_ziti',
     name: 'Baked Ziti',
-    emoji: '🧀',
     description: 'Meatless, cheesy, feeds a crowd and reheats perfectly.',
     servings: 6,
     prepTime: 15,
@@ -575,7 +558,6 @@ const DEFS: Def[] = [
   {
     id: 'greek_chicken_bowls',
     name: 'Greek Chicken Bowls',
-    emoji: '🥙',
     description: 'Oregano chicken, quinoa, cucumber-tomato salad, feta.',
     servings: 4,
     prepTime: 15,
@@ -608,7 +590,6 @@ const DEFS: Def[] = [
   {
     id: 'pesto_chicken_sandwiches',
     name: 'Pesto Chicken Sandwiches',
-    emoji: '🥪',
     description: 'Toasted ciabatta, melted mozzarella, tomato and greens.',
     servings: 4,
     prepTime: 10,
@@ -639,7 +620,6 @@ const DEFS: Def[] = [
   {
     id: 'smash_burgers',
     name: 'Smash Burgers & Slaw',
-    emoji: '🍔',
     description: 'Crispy-edged patties, sharp slaw, oven fries.',
     servings: 4,
     prepTime: 15,
@@ -670,7 +650,6 @@ const DEFS: Def[] = [
   {
     id: 'sausage_peppers_sheetpan',
     name: 'Sausage & Peppers Sheet-Pan',
-    emoji: '🌭',
     description: 'Throw it all on one tray and walk away.',
     servings: 4,
     prepTime: 10,
@@ -699,7 +678,6 @@ const DEFS: Def[] = [
   {
     id: 'coconut_curry_cod',
     name: 'Coconut Curry Cod',
-    emoji: '🥥',
     description: 'Gentle curry broth, flaky fish, rice to soak it up.',
     servings: 4,
     prepTime: 10,
@@ -731,7 +709,6 @@ const DEFS: Def[] = [
   {
     id: 'chicken_soup',
     name: 'Chicken & Noodle Soup',
-    emoji: '🍜',
     description: 'The pot you want when someone in the house is under the weather.',
     servings: 6,
     prepTime: 15,
@@ -762,7 +739,6 @@ const DEFS: Def[] = [
   {
     id: 'sweet_potato_tacos',
     name: 'Black Bean & Sweet Potato Tacos',
-    emoji: '🍠',
     description: 'Roasted sweet potato, smoky beans, avocado, lime.',
     servings: 4,
     prepTime: 10,
@@ -795,7 +771,6 @@ const DEFS: Def[] = [
   {
     id: 'chorizo_corn_rice',
     name: 'Chorizo Street Corn Rice',
-    emoji: '🌽',
     description: 'One skillet: chorizo, charred corn, lime and feta.',
     servings: 4,
     prepTime: 10,
@@ -827,7 +802,6 @@ const DEFS: Def[] = [
   {
     id: 'lemon_orzo_chicken',
     name: 'Lemon Chicken Orzo',
-    emoji: '🍚',
     description: 'Creamy without cream; spinach stirred in at the end.',
     servings: 4,
     prepTime: 10,
@@ -859,7 +833,6 @@ const DEFS: Def[] = [
   {
     id: 'teriyaki_salmon_bowls',
     name: 'Teriyaki-Style Salmon Bowls',
-    emoji: '🍣',
     description: 'Glazed salmon, snap peas, sesame rice.',
     servings: 4,
     prepTime: 10,
@@ -891,7 +864,6 @@ const DEFS: Def[] = [
   {
     id: 'carbonara',
     name: 'Bacon Carbonara',
-    emoji: '🥓',
     description: 'Eggs, parmesan, black pepper, no cream anywhere near it.',
     servings: 4,
     prepTime: 10,
@@ -921,7 +893,6 @@ const DEFS: Def[] = [
   {
     id: 'chickpea_curry_bowls',
     name: 'Chickpea Curry Bowls',
-    emoji: '🫓',
     description: 'Cheap, fast, meatless, and genuinely filling.',
     servings: 4,
     prepTime: 10,
@@ -954,7 +925,6 @@ const DEFS: Def[] = [
   {
     id: 'banh_mi_bowls',
     name: 'Pork Bánh Mì Bowls',
-    emoji: '🥕',
     description: 'Caramelised pork, pickled carrot, sriracha mayo.',
     servings: 4,
     prepTime: 15,
@@ -988,7 +958,6 @@ const DEFS: Def[] = [
   {
     id: 'sausage_zucchini_skillet',
     name: 'Sausage & Zucchini Skillet',
-    emoji: '🥒',
     description: 'Low-effort, low-carb, one pan, done in 25 minutes.',
     servings: 4,
     prepTime: 10,
@@ -1019,7 +988,6 @@ const DEFS: Def[] = [
   {
     id: 'steak_fajita_tacos',
     name: 'Steak Fajita Tacos',
-    emoji: '🥩',
     description: 'Charred steak and peppers, warm flour tortillas.',
     servings: 4,
     prepTime: 15,
@@ -1051,7 +1019,6 @@ const DEFS: Def[] = [
   {
     id: 'lentil_mediterranean_bowls',
     name: 'Mediterranean Lentil Bowls',
-    emoji: '🫒',
     description: 'The cheapest dinner in the library, and not a compromise.',
     servings: 4,
     prepTime: 15,
@@ -1084,7 +1051,6 @@ const DEFS: Def[] = [
   {
     id: 'chicken_parm_bake',
     name: 'Chicken Parm Bake',
-    emoji: '🍅',
     description: 'Crumbed chicken under marinara and mozzarella, spaghetti beneath.',
     servings: 4,
     prepTime: 20,

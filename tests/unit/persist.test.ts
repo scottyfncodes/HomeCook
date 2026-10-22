@@ -152,7 +152,6 @@ describe('export and import', () => {
         {
           id: 'imported_test',
           name: 'Imported Test',
-          emoji: '📒',
           description: '',
           ingredients: [{ ingredientId: 'x_harissa', qty: 2, unit: 'tbsp' as const }],
           servings: 2,
