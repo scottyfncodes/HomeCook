@@ -118,6 +118,13 @@ export const INGREDIENTS: Ingredient[] = [
   ing('rosemary', 'Fresh rosemary', 'produce', 'bunch', [1, 'bunch', 2.49, '1 package']),
   ing('avocado', 'Avocado', 'produce', 'count', [2, 'count', 2.98, '2-pack']),
   ing('snap_peas', 'Sugar snap peas', 'produce', 'oz', [8, 'oz', 3.49, '8 oz bag'], { gramsPerCup: 63 }),
+  ing('leek', 'Leeks', 'produce', 'count', [3, 'count', 3.99, '3-pack'], { aliases: ['leek'] }),
+  ing('eggplant', 'Eggplant', 'produce', 'count', [1, 'count', 1.99, '1 each'], { aliases: ['aubergine'] }),
+  ing('cauliflower', 'Cauliflower', 'produce', 'count', [1, 'count', 3.49, '1 head']),
+  ing('tofu', 'Extra-firm tofu', 'produce', 'oz', [14, 'oz', 2.49, '14 oz block'], {
+    aliases: ['firm tofu', 'tofu'],
+  }),
+  ing('kimchi', 'Kimchi', 'produce', 'cup', [2, 'cup', 6.99, '16 oz jar'], { aliases: ['napa cabbage kimchi'] }),
 
   // ---- Dairy ----
   ing('butter', 'Butter', 'dairy', 'tbsp', [32, 'tbsp', 4.99, '1 lb (4 sticks)'], { staple: true }),
@@ -173,6 +180,11 @@ export const INGREDIENTS: Ingredient[] = [
   ing('hot_sauce', 'Hot sauce', 'pantry', 'tbsp', [24, 'tbsp', 3.29, '12 oz bottle'], { staple: true }),
   ing('sriracha', 'Sriracha', 'pantry', 'tbsp', [34, 'tbsp', 4.49, '17 oz bottle'], { staple: true }),
   ing('gochujang', 'Gochujang', 'pantry', 'tbsp', [30, 'tbsp', 5.49, '1 tub']),
+  ing('fish_sauce', 'Fish sauce', 'pantry', 'tbsp', [13, 'tbsp', 3.99, '6.8 oz bottle']),
+  ing('red_curry_paste', 'Red curry paste', 'pantry', 'tbsp', [8, 'tbsp', 3.79, '4 oz jar'], {
+    aliases: ['thai red curry paste'],
+  }),
+  ing('ketchup', 'Ketchup', 'pantry', 'tbsp', [38, 'tbsp', 3.29, '20 oz bottle'], { aliases: ['catsup'] }),
   ing('rice_vinegar', 'Rice vinegar', 'pantry', 'tbsp', [24, 'tbsp', 2.99, '12 oz bottle'], { staple: true }),
   ing('balsamic', 'Balsamic vinegar', 'pantry', 'tbsp', [32, 'tbsp', 4.49, '16 oz bottle'], { staple: true }),
   ing('honey', 'Honey', 'pantry', 'tbsp', [24, 'tbsp', 5.49, '12 oz bottle'], { staple: true }),
@@ -207,6 +219,9 @@ export const INGREDIENTS: Ingredient[] = [
   ing('black_beans', 'Black beans', 'pantry', 'can', [1, 'can', 1.29, '15 oz can']),
   ing('chickpeas', 'Chickpeas', 'pantry', 'can', [1, 'can', 1.29, '15 oz can'], {
     aliases: ['garbanzo beans'],
+  }),
+  ing('cannellini', 'Cannellini beans', 'pantry', 'can', [1, 'can', 1.49, '15 oz can'], {
+    aliases: ['white beans', 'great northern beans', 'white kidney beans'],
   }),
   ing('lentils', 'Lentils', 'pantry', 'cup', [5, 'cup', 3.29, '1 lb bag'], { gramsPerCup: 200 }),
   ing('salsa', 'Salsa', 'pantry', 'cup', [2, 'cup', 3.29, '16 oz jar']),
