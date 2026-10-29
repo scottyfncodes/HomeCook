@@ -3,6 +3,7 @@
  * how many servings that means, what it costs, how long it takes.
  */
 import type { HomeCookData, Household, PlannedMeal, Recipe } from '@homecook/core/types';
+import { localIsoDate } from '@homecook/core/dates';
 import { getStore } from '@homecook/data/stores';
 import { findRecipe } from '@homecook/engine/library';
 import { estimateMealCost, round2 } from '@homecook/engine/pricing';
@@ -81,4 +82,28 @@ export function weekTotals(resolved: ResolvedMeal[]): WeekTotals {
     leftovers,
     ingredientCost: round2(cost),
   };
+}
+
+export interface UpNext {
+  item: ResolvedMeal;
+  /** True when the meal is planned for today, in this week's plan. */
+  tonight: boolean;
+}
+
+/**
+ * The dinner to put first on the plan: today's, if it is planned and not yet
+ * cooked; otherwise the next uncooked one later in the week. A plan left over
+ * from an earlier week has no "today", so its first uncooked meal is next.
+ */
+export function upNext(resolved: ResolvedMeal[], weekOf: string, now: Date = new Date()): UpNext | null {
+  const monday = new Date(now);
+  monday.setDate(monday.getDate() - ((now.getDay() + 6) % 7));
+  const current = localIsoDate(monday) === weekOf;
+  const todayIndex = current ? (now.getDay() + 6) % 7 : -1;
+
+  const waiting = resolved.filter((r) => r.recipe && !r.meal.cooked);
+  const today = waiting.find((r) => DAYS.indexOf(r.meal.day) === todayIndex);
+  if (today) return { item: today, tonight: true };
+  const later = waiting.find((r) => DAYS.indexOf(r.meal.day) > todayIndex);
+  return later ? { item: later, tonight: false } : null;
 }

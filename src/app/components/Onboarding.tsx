@@ -170,7 +170,7 @@ export function Onboarding() {
           >
             {working ? 'Planning your week…' : 'Plan my first week'}
           </Btn>
-          <p className="fineprint onboard__privacy">Nothing leaves this device. No account, no sign-in, no tracking.</p>
+          <p className="fineprint onboard__privacy">No account, no sign-in. Your meals and lists stay on this device. Visits are counted anonymously.</p>
         </div>
       </div>
     </div>

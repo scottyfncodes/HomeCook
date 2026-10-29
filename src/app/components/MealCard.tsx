@@ -3,6 +3,7 @@ import { RATING_LABEL } from '@homecook/core/types';
 import type { Rating } from '@homecook/core/types';
 import { formatMinutes, formatMoney } from '@homecook/engine/units';
 import { Btn } from '@homecook/app/components/ui';
+import { DishArt } from '@homecook/app/components/DishArt';
 
 export function MealCard({
   resolved,
@@ -57,6 +58,7 @@ export function MealCard({
       </header>
 
       <button type="button" className="meal__main" onClick={onWhy}>
+        <DishArt format={recipe.format} />
         <span className="meal__text">
           <span className="meal__name">
             {recipe.name}

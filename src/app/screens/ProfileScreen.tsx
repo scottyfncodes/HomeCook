@@ -228,8 +228,9 @@ export function ProfileScreen({ data }: { data: HomeCookData }) {
       <DataPanel data={data} />
 
       <p className="fineprint">
-        HomeCook: your meals, your budget, your kitchen. No account, no server, no analytics. All of
-        it lives in this browser until you export it.
+        HomeCook: your meals, your budget, your kitchen. No account and no server. Your plan, lists and
+        ratings live in this browser until you export them. HomeCook counts visits anonymously, with no
+        cookies, and never sees what you cook.
       </p>
     </section>
   );

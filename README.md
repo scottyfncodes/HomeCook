@@ -12,9 +12,10 @@ HOUSEHOLD → WEEK → SWAP / LOCK / GUESTS → GROCERY LIST → COOK → RATE
 ```
 
 HomeCook answers one question: what are we cooking this week, what will it
-cost, and what do we need to buy? Everything lives in the browser — no
-account, no server, no analytics — and can be exported to a JSON file and
-imported on another device.
+cost, and what do we need to buy? Your plan, lists and ratings live in the
+browser (no account, no server) and can be exported to a JSON file and
+imported on another device. The page loads HaveAnApp Pulse, which counts
+visits anonymously without cookies; it never sees the plan or the lists.
 
 ## What it does
 
@@ -48,6 +49,12 @@ imported on another device.
   ingredient the catalogue doesn't know becomes an honest "no price estimate"
   entry; a recipe that mostly fails to resolve is kept as a taste reference
   and marked as not plannable rather than pretending.
+
+- **Tonight first, then cook mode.** The plan opens on tonight's dinner (or
+  the next one still to cook). Cook mode lays out the ingredients scaled to
+  the headcount, then one step at a time in large type, keeps the screen
+  awake where the browser allows, and ends by asking how it was. That rating
+  is what the planner learns from.
 
 ## Layout
 
