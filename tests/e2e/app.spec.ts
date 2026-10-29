@@ -177,6 +177,48 @@ test.describe('HomeCook', () => {
     expect(text).toContain(`• ${first}`);
   });
 
+  test('cooks a dinner step by step, then asks how it was', async ({ page }) => {
+    await onboard(page);
+    const monday = page.locator('.meal').first();
+    await monday.getByRole('button', { name: 'Why this?' }).click();
+    await page.getByRole('dialog').getByRole('button', { name: 'Start cooking' }).click();
+
+    const cook = page.getByRole('dialog', { name: /^Cooking / });
+    await expect(cook.getByText('Get it all out first')).toBeVisible();
+    const firstIngredient = cook.locator('.cook__ing').first();
+    await firstIngredient.click();
+    await expect(firstIngredient).toHaveAttribute('aria-pressed', 'true');
+
+    await cook.locator('.cook__foot').getByRole('button', { name: 'Start cooking' }).click();
+    await expect(cook.getByText(/^Step 1 of \d+$/)).toBeVisible();
+    while (await cook.locator('.cook__foot').count()) {
+      await cook.locator('.cook__foot .btn--primary').click();
+    }
+
+    await expect(cook.getByText('How was it?')).toBeVisible();
+    await cook.getByRole('button', { name: 'Loved it' }).click();
+    await expect(cook).toBeHidden();
+    await expect(monday.getByText('cooked')).toBeVisible();
+    await expect(monday.locator('.meal__rating')).toHaveText('Loved it');
+  });
+
+  test('narrows the recipe library by time and cuisine', async ({ page }) => {
+    await onboard(page);
+    await page.getByRole('button', { name: 'Recipes' }).click();
+    const all = await page.locator('.ritem').count();
+
+    await page.getByLabel('Time').selectOption('30');
+    const quick = await page.locator('.ritem').count();
+    expect(quick).toBeGreaterThan(0);
+    expect(quick).toBeLessThan(all);
+
+    await page.getByLabel('Time').selectOption('');
+    await page.getByLabel('Cuisine').selectOption('italian');
+    const metas = await page.locator('.ritem__meta').allTextContents();
+    expect(metas.length).toBeGreaterThan(0);
+    for (const meta of metas) expect(meta.toLowerCase()).toMatch(/^italian ·/);
+  });
+
   test('fits on a phone without sideways scrolling', async ({ page }) => {
     await onboard(page);
     const overflow = await page.evaluate(

@@ -1,6 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from '@homecook/app/App';
+import '@fontsource/young-serif/latin-400.css';
 import '@homecook/styles/global.css';
 
 const root = document.getElementById('root');

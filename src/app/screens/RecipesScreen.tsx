@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import type { HomeCookData, Protein, Recipe } from '@homecook/core/types';
+import type { Cuisine, HomeCookData, Protein, Recipe } from '@homecook/core/types';
 import { RATINGS, RATING_LABEL } from '@homecook/core/types';
 import { rateRecipe, removeImportedRecipe, setMealRecipe } from '@homecook/core/actions';
 import { apply } from '@homecook/app/useHomeCook';
@@ -11,19 +11,38 @@ import { planServings, scaledTime } from '@homecook/engine/scale';
 import { getStore } from '@homecook/data/stores';
 import { formatMinutes, formatMoney } from '@homecook/engine/units';
 import { IngredientList } from '@homecook/app/components/IngredientList';
+import { CookMode } from '@homecook/app/components/CookMode';
+import { DishArt } from '@homecook/app/components/DishArt';
 import { Btn, Chip, EmptyState, Sheet } from '@homecook/app/components/ui';
 
 const PROTEIN_FILTERS: Protein[] = ['chicken', 'beef', 'pork', 'sausage', 'seafood', 'turkey', 'vegetarian'];
+const TIME_LIMITS = [30, 45, 60];
 
 export function RecipesScreen({ data }: { data: HomeCookData }) {
   const [query, setQuery] = useState('');
   const [protein, setProtein] = useState<Protein | null>(null);
+  const [cuisine, setCuisine] = useState<Cuisine | null>(null);
+  const [maxTime, setMaxTime] = useState<number | null>(null);
   const [open, setOpen] = useState<Recipe | null>(null);
+  const [cooking, setCooking] = useState<{ recipe: Recipe; servings: number } | null>(null);
+
+  const size = householdSize(data.household);
+  const library = useMemo(() => allRecipes(data), [data]);
+  const cuisines = useMemo(
+    () => [...new Set(library.map((recipe) => recipe.cuisine))].sort(),
+    [library],
+  );
 
   const recipes = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return allRecipes(data)
+    return library
       .filter((recipe) => (protein ? recipe.protein === protein : true))
+      .filter((recipe) => (cuisine ? recipe.cuisine === cuisine : true))
+      .filter((recipe) =>
+        maxTime
+          ? scaledTime(recipe, planServings(recipe, size, data.settings.leftovers).servings) <= maxTime
+          : true,
+      )
       .filter((recipe) =>
         q
           ? recipe.name.toLowerCase().includes(q) ||
@@ -32,9 +51,7 @@ export function RecipesScreen({ data }: { data: HomeCookData }) {
           : true,
       )
       .sort((a, b) => a.name.localeCompare(b.name));
-  }, [data, protein, query]);
-
-  const size = householdSize(data.household);
+  }, [library, protein, cuisine, maxTime, query, size, data.settings.leftovers]);
 
   return (
     <section className="screen">
@@ -42,7 +59,7 @@ export function RecipesScreen({ data }: { data: HomeCookData }) {
         <div>
           <h1>Recipes</h1>
           <p className="screen__sub">
-            {allRecipes(data).length} in your library · {data.imported.length} imported
+            {library.length} in your library · {data.imported.length} imported
           </p>
         </div>
       </header>
@@ -65,8 +82,47 @@ export function RecipesScreen({ data }: { data: HomeCookData }) {
         ))}
       </div>
 
+      <div className="filters">
+        <label className="filters__field">
+          <span>Time</span>
+          <select
+            className="input input--select"
+            value={maxTime ?? ''}
+            onChange={(event) => setMaxTime(event.target.value ? Number(event.target.value) : null)}
+          >
+            <option value="">Any length</option>
+            {TIME_LIMITS.map((limit) => (
+              <option key={limit} value={limit}>
+                {limit} min or less
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="filters__field">
+          <span>Cuisine</span>
+          <select
+            className="input input--select"
+            value={cuisine ?? ''}
+            onChange={(event) => setCuisine((event.target.value || null) as Cuisine | null)}
+          >
+            <option value="">All cuisines</option>
+            {cuisines.map((item) => (
+              <option key={item} value={item}>
+                {item[0]!.toUpperCase() + item.slice(1)}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+
+      {(protein || cuisine || maxTime || query) && (
+        <p className="screen__sub">
+          {recipes.length} of {library.length} match
+        </p>
+      )}
+
       {recipes.length === 0 ? (
-        <EmptyState title="No matches" body="Try a different search or clear the filter." />
+        <EmptyState title="No matches" body="Try a different search or clear a filter." />
       ) : (
         <ul className="rlist">
           {recipes.map((recipe) => {
@@ -76,6 +132,7 @@ export function RecipesScreen({ data }: { data: HomeCookData }) {
             return (
               <li key={recipe.id}>
                 <button type="button" className="ritem" onClick={() => setOpen(recipe)}>
+                  <DishArt format={recipe.format} size={40} />
                   <span className="ritem__text">
                     <strong>{recipe.name}</strong>
                     <span className="ritem__meta">
@@ -97,12 +154,43 @@ export function RecipesScreen({ data }: { data: HomeCookData }) {
         </ul>
       )}
 
-      {open && <RecipeSheet data={data} recipe={open} onClose={() => setOpen(null)} />}
+      {open && (
+        <RecipeSheet
+          data={data}
+          recipe={open}
+          onClose={() => setOpen(null)}
+          onCook={(servings) => {
+            setCooking({ recipe: open, servings });
+            setOpen(null);
+          }}
+        />
+      )}
+      {cooking && (
+        <CookMode
+          recipe={cooking.recipe}
+          servings={cooking.servings}
+          onClose={() => setCooking(null)}
+          onFinish={(rating) => {
+            if (rating) apply((current) => rateRecipe(current, cooking.recipe.id, rating));
+            setCooking(null);
+          }}
+        />
+      )}
     </section>
   );
 }
 
-function RecipeSheet({ data, recipe, onClose }: { data: HomeCookData; recipe: Recipe; onClose: () => void }) {
+function RecipeSheet({
+  data,
+  recipe,
+  onClose,
+  onCook,
+}: {
+  data: HomeCookData;
+  recipe: Recipe;
+  onClose: () => void;
+  onCook: (servings: number) => void;
+}) {
   const size = householdSize(data.household);
   const [servings, setServings] = useState(() => planServings(recipe, size, data.settings.leftovers).servings);
   const cost = estimateMealCost(recipe, servings, getStore(data.settings.storeId).factor);
@@ -145,6 +233,11 @@ function RecipeSheet({ data, recipe, onClose }: { data: HomeCookData; recipe: Re
         Written for {recipe.servings}; quantities below are scaled. About {formatMoney(cost)} of
         ingredients, {formatMinutes(scaledTime(recipe, servings))}.
       </p>
+      {recipe.steps.length > 0 && (
+        <Btn variant="primary" wide onClick={() => onCook(servings)}>
+          Cook {servings} servings now
+        </Btn>
+      )}
 
       <h3 className="sheet__h3">Ingredients</h3>
       <IngredientList recipe={recipe} servings={servings} />

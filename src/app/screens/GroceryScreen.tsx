@@ -65,7 +65,7 @@ export function GroceryScreen({ data }: { data: HomeCookData }) {
         <div>
           <h1>Grocery</h1>
           <p className="screen__sub">
-            {list.checkedCount}/{list.itemCount} picked up · {store.name}
+            {list.itemCount} {list.itemCount === 1 ? 'item' : 'items'} · {store.name}
           </p>
         </div>
       </header>
@@ -86,6 +86,12 @@ export function GroceryScreen({ data }: { data: HomeCookData }) {
                 : `${formatMoney(budget.remaining)} left`}
             </strong>
           </div>
+        </div>
+        <div className="pickup">
+          <span className="pickup__label">In the cart</span>
+          <span className="pickup__count">
+            {list.checkedCount} of {list.itemCount}
+          </span>
         </div>
         <Meter fraction={list.itemCount ? list.checkedCount / list.itemCount : 0} />
         {list.unpricedItems > 0 && (
@@ -198,9 +204,15 @@ export function GroceryScreen({ data }: { data: HomeCookData }) {
 
       {list.covered.length > 0 && (
         <div className="glist">
-          <button type="button" className="glist__toggle" onClick={() => setShowCovered((v) => !v)}>
-            {showCovered ? '▾' : '▸'} Not buying ({list.covered.length})
+          <button
+            type="button"
+            className="glist__toggle"
+            aria-expanded={showCovered}
+            onClick={() => setShowCovered((v) => !v)}
+          >
+            {showCovered ? '▾' : '▸'} Already at home ({list.covered.length})
           </button>
+          <p className="fineprint">{coveredSummary(list.covered)} Left off the list and the total.</p>
           {showCovered && (
             <ul>
               {list.covered.map((line) => (
@@ -308,4 +320,13 @@ export function GroceryScreen({ data }: { data: HomeCookData }) {
       </Sheet>
     </section>
   );
+}
+
+function coveredSummary(covered: GroceryLine[]): string {
+  const pantry = covered.filter((line) => line.coveredBy === 'pantry').length;
+  const dismissed = covered.length - pantry;
+  const parts: string[] = [];
+  if (pantry) parts.push(`${pantry} in your pantry`);
+  if (dismissed) parts.push(`${dismissed} you said you have`);
+  return `${parts.join(', ')}.`.replace(/^./, (c) => c.toUpperCase());
 }

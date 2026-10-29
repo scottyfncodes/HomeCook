@@ -135,10 +135,10 @@ describe('history and ratings', () => {
       ...base,
       history: [{ recipeId: 'garlic_herb_chicken_pasta', date: twoDaysAgo, diners: 2 }],
     };
-    const before = swapOptions(base, base.plan.meals[0]!.id, 40).find(
+    const before = swapOptions(base, base.plan.meals[0]!.id, RECIPES.length).find(
       (o) => o.recipe.id === 'garlic_herb_chicken_pasta',
     )!;
-    const after = swapOptions(cooked, cooked.plan.meals[0]!.id, 40).find(
+    const after = swapOptions(cooked, cooked.plan.meals[0]!.id, RECIPES.length).find(
       (o) => o.recipe.id === 'garlic_herb_chicken_pasta',
     )!;
     expect(after.score).toBeLessThan(before.score);
@@ -148,11 +148,11 @@ describe('history and ratings', () => {
   it('lifts meals you loved and sinks ones you rejected', () => {
     const base = withMeals(makeData(), ['southwest_beef_bowls']);
     const target = 'sheetpan_lemon_chicken';
-    const plain = swapOptions(base, base.plan.meals[0]!.id, 40).find((o) => o.recipe.id === target)!;
-    const loved = swapOptions(rateRecipe(base, target, 'loved'), base.plan.meals[0]!.id, 40).find(
+    const plain = swapOptions(base, base.plan.meals[0]!.id, RECIPES.length).find((o) => o.recipe.id === target)!;
+    const loved = swapOptions(rateRecipe(base, target, 'loved'), base.plan.meals[0]!.id, RECIPES.length).find(
       (o) => o.recipe.id === target,
     )!;
-    const rejected = swapOptions(rateRecipe(base, target, 'no'), base.plan.meals[0]!.id, 40).find(
+    const rejected = swapOptions(rateRecipe(base, target, 'no'), base.plan.meals[0]!.id, RECIPES.length).find(
       (o) => o.recipe.id === target,
     )!;
 

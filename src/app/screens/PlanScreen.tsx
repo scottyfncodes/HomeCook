@@ -11,7 +11,7 @@ import {
 } from '@homecook/core/actions';
 import { apply } from '@homecook/app/useHomeCook';
 import { budgetStatus, buildGroceryList } from '@homecook/engine/grocery';
-import { householdSize, resolveWeek, weekTotals } from '@homecook/engine/plan';
+import { householdSize, resolveWeek, upNext, weekTotals } from '@homecook/engine/plan';
 import { explainMeal, swapOptions } from '@homecook/engine/planner';
 import { plannableRecipes } from '@homecook/engine/library';
 import { formatMinutes, formatMoney } from '@homecook/engine/units';
@@ -20,6 +20,8 @@ import { getStore } from '@homecook/data/stores';
 import { planServings } from '@homecook/engine/scale';
 import { IngredientList } from '@homecook/app/components/IngredientList';
 import { MealCard } from '@homecook/app/components/MealCard';
+import { CookMode } from '@homecook/app/components/CookMode';
+import { DishArt } from '@homecook/app/components/DishArt';
 import { Btn, Meter, Row, Sheet, Stepper } from '@homecook/app/components/ui';
 
 type SheetState =
@@ -32,6 +34,7 @@ type SheetState =
 export function PlanScreen({ data }: { data: HomeCookData }) {
   const [sheet, setSheet] = useState<SheetState>(null);
   const [regenerating, setRegenerating] = useState(false);
+  const [cooking, setCooking] = useState<string | null>(null);
 
   const resolved = useMemo(() => resolveWeek(data), [data]);
   const totals = useMemo(() => weekTotals(resolved), [resolved]);
@@ -39,6 +42,8 @@ export function PlanScreen({ data }: { data: HomeCookData }) {
   const budget = budgetStatus(data.settings.budget, grocery.total);
   const size = householdSize(data.household);
   const lockedCount = data.plan.meals.filter((m) => m.locked).length;
+  const next = useMemo(() => upNext(resolved, data.plan.weekOf), [resolved, data.plan.weekOf]);
+  const cookingMeal = cooking ? resolved.find((r) => r.meal.id === cooking) ?? null : null;
 
   const regenerate = () => {
     setRegenerating(true);
@@ -62,6 +67,26 @@ export function PlanScreen({ data }: { data: HomeCookData }) {
           </p>
         </div>
       </header>
+
+      {next?.item.recipe && (
+        <section className="tonight card" aria-label={next.tonight ? 'Tonight' : 'Next up'}>
+          <div className="tonight__top">
+            <DishArt format={next.item.recipe.format} size={60} />
+            <div className="tonight__text">
+              <span className="tonight__label">
+                {next.tonight ? 'Tonight' : `Next up · ${next.item.meal.day}`}
+              </span>
+              <h2 className="tonight__name">{next.item.recipe.name}</h2>
+              <span className="tonight__meta">
+                {formatMinutes(next.item.time)} · {next.item.servings} servings for {next.item.diners}
+              </span>
+            </div>
+          </div>
+          <Btn variant="primary" wide onClick={() => setCooking(next.item.meal.id)}>
+            Start cooking
+          </Btn>
+        </section>
+      )}
 
       <div className="budget card">
         <div className="budget__top">
@@ -90,7 +115,7 @@ export function PlanScreen({ data }: { data: HomeCookData }) {
       </div>
 
       <div className="plan__actions">
-        <Btn variant="primary" wide onClick={regenerate} disabled={regenerating}>
+        <Btn variant={next ? 'default' : 'primary'} wide onClick={regenerate} disabled={regenerating}>
           {regenerating ? 'Planning…' : 'Regenerate week'}
         </Btn>
         {lockedCount > 0 && (
@@ -125,10 +150,30 @@ export function PlanScreen({ data }: { data: HomeCookData }) {
         <SwapSheet data={data} mealId={sheet.mealId} onClose={() => setSheet(null)} />
       )}
       {sheet?.kind === 'why' && active && (
-        <WhySheet data={data} mealId={sheet.mealId} onClose={() => setSheet(null)} />
+        <WhySheet
+          data={data}
+          mealId={sheet.mealId}
+          onClose={() => setSheet(null)}
+          onCook={() => {
+            setCooking(sheet.mealId);
+            setSheet(null);
+          }}
+        />
       )}
       {sheet?.kind === 'options' && active && (
         <OptionsSheet data={data} mealId={sheet.mealId} onClose={() => setSheet(null)} />
+      )}
+      {cookingMeal?.recipe && (
+        <CookMode
+          recipe={cookingMeal.recipe}
+          servings={cookingMeal.servings}
+          context={`${cookingMeal.meal.day} dinner`}
+          onClose={() => setCooking(null)}
+          onFinish={(rating) => {
+            apply((current) => markCooked(current, cookingMeal.meal.id, rating));
+            setCooking(null);
+          }}
+        />
       )}
       {sheet?.kind === 'pick' && active && (
         <PickSheet data={data} mealId={sheet.mealId} onClose={() => setSheet(null)} />
@@ -187,7 +232,17 @@ function SwapSheet({ data, mealId, onClose }: { data: HomeCookData; mealId: stri
   );
 }
 
-function WhySheet({ data, mealId, onClose }: { data: HomeCookData; mealId: string; onClose: () => void }) {
+function WhySheet({
+  data,
+  mealId,
+  onClose,
+  onCook,
+}: {
+  data: HomeCookData;
+  mealId: string;
+  onClose: () => void;
+  onCook: () => void;
+}) {
   const candidate = useMemo(() => explainMeal(data, mealId), [data, mealId]);
   const meal = data.plan.meals.find((m) => m.id === mealId)!;
 
@@ -203,6 +258,9 @@ function WhySheet({ data, mealId, onClose }: { data: HomeCookData; mealId: strin
   return (
     <Sheet open title={recipe.name} onClose={onClose}>
       <p className="sheet__lede">{recipe.description}</p>
+      <Btn variant="primary" wide onClick={onCook}>
+        Start cooking
+      </Btn>
 
       <h3 className="sheet__h3">Why HomeCook picked this</h3>
       {candidate.reasons.length ? (
